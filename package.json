@@ -1,0 +1,27 @@
+{
+  "name": "alexa-ask-me-anything",
+  "version": "0.0.1",
+  "repository": "https://github.com/tienducle/alexa-ask-me-anything",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "ask-sdk-core": "^2.14.0",
+    "ask-sdk-dynamodb-persistence-adapter": "^2.14.0",
+    "ask-sdk-model": "^1.86.0",
+    "base-x": "^4.0.0",
+    "bcryptjs": "^2.4.3"
+  },
+  "scripts": {
+    "tests": "export $(cat test_env_common.sh $@ | xargs); export $(cat test_env_local.sh $@ | xargs); LOG_LEVEL=$LOG_LEVEL ./node_modules/.bin/mocha 'tests/**/*-test.mjs' --timeout 60000",
+    "tests-with-coverage-no-stdout": "nyc --silent --no-clean npm run tests",
+    "tests-with-coverage": "nyc npm run tests",
+    "coverage-report": "nyc report"
+  },
+  "devDependencies": {
+    "@aws-sdk/client-dynamodb": "^3.584.0",
+    "@aws-sdk/lib-dynamodb": "^3.584.0",
+    "chai": "^4.3.6",
+    "mocha": "^10.2.0",
+    "nyc": "^15.1.0"
+  }
+}

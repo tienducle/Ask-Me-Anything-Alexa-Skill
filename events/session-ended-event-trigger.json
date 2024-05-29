@@ -1,0 +1,62 @@
+{
+  "version": "1.0",
+  "session": {
+    "new": false,
+    "sessionId": "amzn1.echo-api.session.0fabce8f-c9e5-41f2-a9da-7809e805ab55",
+    "application": {
+      "applicationId": "amzn1.ask.skill.af36b546-6640-4e26-850d-5f5a7a71eb37"
+    },
+    "attributes": {},
+    "user": {
+      "userId": "amzn1.ask.account.myuserid"
+    }
+  },
+  "context": {
+    "Viewport": {
+      "experiences": [
+        {
+          "arcMinuteWidth": 0,
+          "arcMinuteHeight": 0,
+          "canRotate": false,
+          "canResize": false
+        }
+      ],
+      "mode": "MOBILE",
+      "shape": "RECTANGLE",
+      "pixelWidth": 3200,
+      "pixelHeight": 1440,
+      "dpi": 0,
+      "currentPixelWidth": 3200,
+      "currentPixelHeight": 1440,
+      "touch": [
+        "SINGLE"
+      ],
+      "keyboard": [
+        "DIRECTION"
+      ]
+    },
+    "System": {
+      "application": {
+        "applicationId": "amzn1.ask.skill.af36b546-6640-4e26-850d-5f5a7a71eb37"
+      },
+      "user": {
+        "userId": "amzn1.ask.account.myuserid"
+      },
+      "device": {
+        "deviceId": "amzn1.ask.device.mydeviceid",
+        "supportedInterfaces": {
+          "Geolocation": {}
+        }
+      },
+      "apiEndpoint": "https://api.eu.amazonalexa.com",
+      "apiAccessToken": "sometoken"
+    }
+  },
+  "request": {
+    "type": "SessionEndedRequest",
+    "requestId": "amzn1.echo-api.request.298cb9c8-cf4a-4d28-9584-d5edcedc45fd",
+    "timestamp": "2024-05-25T16:46:18Z",
+    "locale": "de-DE",
+    "reason": "USER_INITIATED"
+  }
+}

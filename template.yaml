@@ -1,0 +1,115 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  ask-me-anything
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 4096
+
+Parameters:
+    LogLevel:
+        Type: String
+        Default: error
+        AllowedValues:
+        - error
+        - warn
+        - info
+        - debug
+    OpenAiApiKey:
+        Type: String
+    OpenAiModel:
+        Type: String
+        Default: "gpt-4o"
+    DynamoDbEndpointOverride:
+      Type: String
+      Default: ""
+    DynamoDbRegion:
+      Type: String
+      Default: "eu-west-1"
+    DynamoDbUserDataTableName:
+        Type: String
+        Default: "AskMeAnything-UserData"
+    DynamoDbUserDataTablePartitionKeyName:
+        Type: String
+        Default: "id"
+    DynamoDbAccountMappingsTableName:
+        Type: String
+        Default: "AskMeAnything-AccountMappings"
+    DynamoDbAccountMappingsTablePartitionKeyName:
+        Type: String
+        Default: "id"
+    UsernameSalt:
+        Type: String
+    PasswordSalt:
+        Type: String
+    EncryptedUserIdSalt:
+        Type: String
+    EncryptedApiKeySalt:
+      Type: String
+
+Resources:
+  AskMeAnything:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: ./
+      Handler: src/index.handler
+      Runtime: nodejs20.x
+      Architectures:
+      - x86_64
+      Environment:
+        Variables:
+          LOG_LEVEL: !Ref LogLevel
+          LOG_LEVEL_LOCALE_SERVICE: "warn"
+          GPT_OPEN_AI_API_KEY: !Ref OpenAiApiKey
+          GPT_OPEN_AI_MODEL: !Ref OpenAiModel
+          DYNAMO_DB_ENDPOINT_OVERRIDE: !Ref DynamoDbEndpointOverride
+          DYNAMO_DB_REGION: !Ref DynamoDbRegion
+          DYNAMO_DB_USER_DATA_TABLE_NAME: !Ref DynamoDbUserDataTableName
+          DYNAMO_DB_USER_DATA_TABLE_PARTITION_KEY_NAME: !Ref DynamoDbUserDataTablePartitionKeyName
+          DYNAMO_DB_ACCOUNT_MAPPINGS_TABLE_NAME: !Ref DynamoDbAccountMappingsTableName
+          DYNAMO_DB_ACCOUNT_MAPPINGS_TABLE_PARTITION_KEY_NAME: !Ref DynamoDbAccountMappingsTablePartitionKeyName
+          USERNAME_SALT: !Ref UsernameSalt
+          PASSWORD_SALT: !Ref PasswordSalt
+          ENCRYPTED_USER_ID_SALT: !Ref EncryptedUserIdSalt
+          ENCRYPTED_API_KEY_SALT: !Ref EncryptedApiKeySalt
+
+  AskMeAnythingLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${AskMeAnything}"
+      RetentionInDays: 1
+
+  AskMeAnythingUserDataDynamoDbTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Ref DynamoDbUserDataTableName
+      AttributeDefinitions:
+        - AttributeName: !Ref DynamoDbUserDataTablePartitionKeyName
+          AttributeType: S
+      KeySchema:
+        - AttributeName: !Ref DynamoDbUserDataTablePartitionKeyName
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+  AskMeAnythingAccountMappingsDynamoDbTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Ref DynamoDbAccountMappingsTableName
+      AttributeDefinitions:
+        - AttributeName: !Ref DynamoDbAccountMappingsTablePartitionKeyName
+          AttributeType: S
+      KeySchema:
+        - AttributeName: !Ref DynamoDbAccountMappingsTablePartitionKeyName
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+Outputs:
+  AskMeAnything:
+    Description: AskMeAnything Lambda Function ARN
+    Value: !GetAtt AskMeAnything.Arn
+  AskMeAnythingIamRole:
+    Description: Implicit IAM Role created for AskMeAnything Lambda Function
+    Value: !GetAtt AskMeAnythingRole.Arn

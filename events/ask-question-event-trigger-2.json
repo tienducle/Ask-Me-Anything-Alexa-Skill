@@ -1,0 +1,105 @@
+{
+  "version": "1.0",
+  "session": {
+    "new": false,
+    "sessionId": "amzn1.echo-api.session.e4cfda26-302e-4fb1-b2e8-65ec7542ec50",
+    "application": {
+      "applicationId": "amzn1.ask.skill.af36b546-6640-4e26-850d-5f5a7a71eb37"
+    },
+    "attributes": {},
+    "user": {
+      "userId": "amzn1.ask.account.myuserid"
+    },
+    "affiliatedResources": []
+  },
+  "context": {
+    "Viewport": {
+      "experiences": [
+        {
+          "arcMinuteWidth": 0,
+          "arcMinuteHeight": 0,
+          "canRotate": false,
+          "canResize": false
+        }
+      ],
+      "mode": "MOBILE",
+      "shape": "RECTANGLE",
+      "pixelWidth": 3200,
+      "pixelHeight": 1440,
+      "dpi": 0,
+      "currentPixelWidth": 3200,
+      "currentPixelHeight": 1440,
+      "touch": [
+        "SINGLE"
+      ],
+      "keyboard": [
+        "DIRECTION"
+      ]
+    },
+    "Extensions": {
+      "available": {}
+    },
+    "Advertising": {
+      "advertisingId": "00000000-0000-0000-0000-000000000000",
+      "limitAdTracking": true
+    },
+    "System": {
+      "application": {
+        "applicationId": "amzn1.ask.skill.af36b546-6640-4e26-850d-5f5a7a71eb37"
+      },
+      "user": {
+        "userId": "amzn1.ask.account.myuserid"
+      },
+      "device": {
+        "deviceId": "amzn1.ask.device.mydeviceid",
+        "supportedInterfaces": {
+          "Geolocation": {}
+        }
+      },
+      "apiEndpoint": "https://api.eu.amazonalexa.com",
+      "apiAccessToken": "sometoken"
+    }
+  },
+  "request": {
+    "type": "IntentRequest",
+    "requestId": "amzn1.echo-api.request.dd621fd0-49f0-49b6-874f-87aec0fc445c",
+    "locale": "de-DE",
+    "timestamp": "2024-05-25T16:47:42Z",
+    "intent": {
+      "name": "AskQuestionIntent",
+      "confirmationStatus": "NONE",
+      "slots": {
+        "query": {
+          "name": "query",
+          "value": "und wie muss ich sie garen",
+          "resolutions": {
+            "resolutionsPerAuthority": [
+              {
+                "authority": "AlexaEntities",
+                "status": {
+                  "code": "ER_SUCCESS_NO_MATCH"
+                }
+              }
+            ]
+          },
+          "confirmationStatus": "NONE",
+          "source": "USER",
+          "slotValue": {
+            "type": "Simple",
+            "value": "und wie muss ich sie garen",
+            "resolutions": {
+              "resolutionsPerAuthority": [
+                {
+                  "authority": "AlexaEntities",
+                  "status": {
+                    "code": "ER_SUCCESS_NO_MATCH"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

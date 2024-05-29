@@ -1,0 +1,10 @@
+{
+  "callbackWaitsForEmptyEventLoop": true,
+  "functionVersion": "$LATEST",
+  "functionName": "ask-me-anything-AskMeAnything-6EkYNZDZYMmH",
+  "memoryLimitInMB": "2048",
+  "logGroupName": "/aws/lambda/ask-me-anything-AskMeAnything-6EkYNZDZYMmH",
+  "logStreamName": "2024/05/25/[$LATEST]c7c28074ef454adbb4beda65acd7ed6e",
+  "invokedFunctionArn": "arn:aws:lambda:eu-west-1:361902846135:function:ask-me-anything-AskMeAnything-6EkYNZDZYMmH",
+  "awsRequestId": "4fce0759-65d6-4ff7-ae4d-dd7f03a9e582"
+}

@@ -1,0 +1,11 @@
+tests/*
+.nyc_output
+
+.idea
+env
+events
+deploy.sh
+invoke-local.sh
+LICENSE
+README.md
+template.yaml

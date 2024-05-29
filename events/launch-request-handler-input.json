@@ -1,0 +1,87 @@
+{
+  "requestEnvelope": {
+    "version": "1.0",
+    "session": {
+      "new": true,
+      "sessionId": "amzn1.echo-api.session.e4cfda26-302e-4fb1-b2e8-65ec7542ec50",
+      "application": {
+        "applicationId": "amzn1.ask.skill.af36b546-6640-4e26-850d-5f5a7a71eb37"
+      },
+      "attributes": {},
+      "user": {
+        "userId": "amzn1.ask.account.myuserid"
+      },
+      "affiliatedResources": []
+    },
+    "context": {
+      "Viewport": {
+        "experiences": [
+          {
+            "arcMinuteWidth": 0,
+            "arcMinuteHeight": 0,
+            "canRotate": false,
+            "canResize": false
+          }
+        ],
+        "mode": "MOBILE",
+        "shape": "RECTANGLE",
+        "pixelWidth": 3200,
+        "pixelHeight": 1440,
+        "dpi": 0,
+        "currentPixelWidth": 3200,
+        "currentPixelHeight": 1440,
+        "touch": [
+          "SINGLE"
+        ],
+        "keyboard": [
+          "DIRECTION"
+        ]
+      },
+      "Extensions": {
+        "available": {}
+      },
+      "Advertising": {
+        "advertisingId": "00000000-0000-0000-0000-000000000000",
+        "limitAdTracking": true
+      },
+      "System": {
+        "application": {
+          "applicationId": "amzn1.ask.skill.af36b546-6640-4e26-850d-5f5a7a71eb37"
+        },
+        "user": {
+          "userId": "amzn1.ask.account.myuserid"
+        },
+        "device": {
+          "deviceId": "amzn1.ask.device.mydeviceid",
+          "supportedInterfaces": {
+            "Geolocation": {}
+          }
+        },
+        "apiEndpoint": "https://api.eu.amazonalexa.com",
+        "apiAccessToken": "sometoken"
+      }
+    },
+    "request": {
+      "type": "LaunchRequest",
+      "requestId": "amzn1.echo-api.request.acf3845e-c664-4564-a88b-3471f139c8d2",
+      "locale": "de-DE",
+      "timestamp": "2024-05-25T16:46:18Z",
+      "shouldLinkResultBeReturned": false
+    },
+    "_internal": {
+      "locale": "de"
+    }
+  },
+  "context": {
+    "callbackWaitsForEmptyEventLoop": true,
+    "functionVersion": "$LATEST",
+    "functionName": "ask-me-anything-AskMeAnything-6EkYNZDZYMmH",
+    "memoryLimitInMB": "2048",
+    "logGroupName": "/aws/lambda/ask-me-anything-AskMeAnything-6EkYNZDZYMmH",
+    "logStreamName": "2024/05/25/[$LATEST]5e66406416814f3ea2b7f90a055b96d8",
+    "invokedFunctionArn": "arn:aws:lambda:eu-west-1:361902846135:function:ask-me-anything-AskMeAnything-6EkYNZDZYMmH",
+    "awsRequestId": "e7bb64a2-71e9-4b3e-9fb1-93c70d58572d"
+  },
+  "attributesManager": {},
+  "responseBuilder": {}
+}
