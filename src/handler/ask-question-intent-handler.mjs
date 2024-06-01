@@ -90,7 +90,7 @@ export class AskQuestionIntentHandler {
 
         return handlerInput.responseBuilder
             .speak(answerPrefixTexts.speechText + answer)
-            .withSimpleCard(answerPrefixTexts.cardTitle, answerPrefixTexts.cardContent + answer)
+            .withSimpleCard(query, answerPrefixTexts.cardContent + answer)
             .reprompt(repromptTexts.speechText, 'ENQUEUE')
             .withShouldEndSession(false)
             .getResponse();
