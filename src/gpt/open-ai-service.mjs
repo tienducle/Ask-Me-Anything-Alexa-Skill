@@ -58,21 +58,12 @@ export class OpenAiService {
             });
 
             const body = {
-                messages: messages, "temperature": 0.5, "model": "gpt-4o", "n": 1, "max_tokens": 2000
+                messages: messages, "temperature": 0.5, "model": MODEL, "n": 1, "max_tokens": 4000
             };
             const options = {
                 method: 'POST', headers: headers, body: JSON.stringify(body)
             };
-            /*
-                        fetch(url, options)
-                            .then(response => response.json())
-                            .then(data => {
-                                console.log(data.choices[0].message.content);
-                            })
-                            .catch((error) => {
-                                console.error('Error:', error);
-                            });
-                            */
+
             return fetch(url, options)
                 .then(response => response.json())
                 .then(data => {
