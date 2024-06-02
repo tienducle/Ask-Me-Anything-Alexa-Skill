@@ -115,7 +115,7 @@ describe("RegistrationIntentHandler tests", () => {
         expect(response.response.outputSpeech.ssml).to.equal("<speak>You can set up your own API Key at https://link.pinguincloud.de/ama-en. Use the following credentials. The skill will now close to invalidate your current session.</speak>");
         expect(response.response.card.content).to.contain("You can set up your own API Key at https://link.pinguincloud.de/ama-en\n");
         expect(response.response.card.content).to.contain("Use the following credentials:\n");
-        expect(response.response.card.content).to.contain("Username: 7867421#");
+        expect(response.response.card.content).to.contain("Username: 3254680#");
         expect(response.response.card.content).to.contain("Password: 2btTMtvR2TzuJgHt");
     });
 

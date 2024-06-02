@@ -46,20 +46,23 @@ export class OpenAiService {
 
             messageHistory.forEach((message) => {
                 messages.push({
-                    "content": message.assistant, "role": "assistant"
+                    "content": message.user, "role": "user"
                 });
                 messages.push({
-                    "content": message.user, "role": "user"
+                    "content": message.assistant, "role": "assistant"
                 });
             });
 
             messages.push({
-                "content": queryPrefix + query, "role": "user"
+                "content": query, "role": "user"
             });
 
             const body = {
                 messages: messages, "temperature": 0.5, "model": MODEL, "n": 1, "max_tokens": 4000
             };
+
+            logger.debug(`Sending request to OpenAI with body: ${JSON.stringify(body)}`);
+
             const options = {
                 method: 'POST', headers: headers, body: JSON.stringify(body)
             };

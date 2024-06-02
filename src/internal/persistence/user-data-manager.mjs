@@ -152,7 +152,7 @@ export class UserDataManager {
             return undefined;
         }
 
-        apiKey = CryptoWrapper.decrypt(hashedUserId + Environment.encryptedApiKeySalt, apiKeyEncrypted);
+        apiKey = CryptoWrapper.decrypt(userId + hashedUserId + Environment.encryptedApiKeySalt, apiKeyEncrypted);
         this.putApiKeyToCache(hashedUserId, apiKey);
         logger.debug("Cached user API key")
         return apiKey;
@@ -361,7 +361,7 @@ export class UserDataManager {
      */
     async updateApiKey(userId, apiKey) {
         const hashedUserId = this.getHashedUserId(userId);
-        const apiKeyEncrypted = CryptoWrapper.encrypt(hashedUserId + Environment.encryptedApiKeySalt, apiKey);
+        const apiKeyEncrypted = apiKey ? CryptoWrapper.encrypt(userId + hashedUserId + Environment.encryptedApiKeySalt, apiKey) : "";
 
         const updateExpression = "set #apiKeyEncrypted = :apiKeyEncrypted, #lastModified = :lastModified";
         const expressionAttributeNames = {
