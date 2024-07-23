@@ -14,38 +14,54 @@ const USER_DATA_CACHE_TTL = 1000 * 60 * 4; // 4 minutes
 const USER_ID_HASH_CACHE_TTL = 1000 * 60 * 60; // 60 minutes
 const API_KEY_CACHE_TTL = 1000 * 60 * 5; // 5 minutes
 
+// 90 days until a user is considered inactive and will be purged
+const DAYS_UNTIL_INACTIVE = 90;
+const MILLIS_UNTIL_INACTIVE = DAYS_UNTIL_INACTIVE * 24 * 60 * 60 * 1000;
+
+/**
+ * User data persistence using DynamoDB.
+ *
+ * Primary key is a hash of the Alexa-provided userId.
+ * The ID identifies the user across all devices,
+ * until the skill is removed and re-installed.
+ */
 export class UserDataManager {
 
+    /**
+     *
+     * @param dynamoDbClientWrapper {DynamoDbClientWrapper}
+     * @param accountMappingsManager {UserAccountMappingsManager}
+     */
     constructor(dynamoDbClientWrapper, accountMappingsManager) {
         this.dynamoDbClientWrapper = dynamoDbClientWrapper;
         this.accountMappingsManager = accountMappingsManager;
 
-        // hashedUserId -> { timestamp: 12345, userData: userData }
+        // hashedAlexaUserId -> { timestamp: 12345, userData: <userData> }
         this.userDataCache = new Map();
 
-        // userId -> { timestamp: 12345, hashedUserId: hashedUserId }
-        this.userIdHashCache = new Map();
+        // alexaUserId -> { timestamp: 12345, hashedAlexaUserId: <hashedAlexaUserId> }
+        this.hashedAlexaUserIdCache = new Map();
 
-        // hashedUserId -> { timestamp: 12345, apiKey: apiKey }
+        // hashedAlexaUserId -> { timestamp: 12345, apiKey: <apiKey> }
         this.apiKeyCache = new Map();
     }
 
     /**
      *
-     * @param userId
-     * @return {UserData}
+     * @param alexaUserId
+     * @return {boolean}
      */
-    async ensureUserDataEntryExists(userId) {
-        return (await this.#loadOrCreateUserData(userId) !== undefined);
+    async ensureUserDataEntryExists(alexaUserId) {
+        return (await this.#loadOrCreateUserData(alexaUserId) !== undefined);
     }
 
     /**
      * Create an entry in the account mappings table for the given user id.
-     * @param userId
+     * @param alexaUserId
      * @return {Promise<boolean>} true if entry was created successfully, false otherwise
      */
-    async registerUserAccountMapping(userId) {
-        const userData = await this.#loadOrCreateUserData(userId);
+    async registerUserAccountMapping(alexaUserId) {
+        const userData = await this.#loadOrCreateUserData(alexaUserId);
         if (userData.isRegistered()) {
             return true;
         }
@@ -53,7 +69,7 @@ export class UserDataManager {
         // create account mapping and obtain username
         let username;
         try {
-            username = await this.accountMappingsManager.createAccountMapping(userId, userData.getHashedUserId());
+            username = await this.accountMappingsManager.createAccountMapping(alexaUserId, userData.getHashedAlexaUserId());
         } catch (error) {
             logger.error(`Error while creating account mapping: ${error}`);
             return false;
@@ -71,13 +87,13 @@ export class UserDataManager {
     /**
      * Get the hashed user id for the given user id.
      * If the hashed user id is not in the cache, hash the user id and store it in the cache.
-     * @param userId
+     * @param alexaUserId
      * @return {string}
      */
-    getHashedUserId(userId) {
-        return this.getHashedUserIdFromCache(userId) || (() => {
-            const hash = crypto.createHash('sha512').update(userId).digest('hex');
-            this.putHashedUserIdToCache(userId, hash);
+    getHashedAlexaUserId(alexaUserId) {
+        return this.getHashedAlexaUserIdFromCache(alexaUserId) || (() => {
+            const hash = crypto.createHash('sha512').update(alexaUserId).digest('hex');
+            this.putHashedAlexaUserIdToCache(alexaUserId, hash);
             return hash;
         })();
     }
@@ -85,75 +101,81 @@ export class UserDataManager {
     /**
      * Returns the username of the user specified by the user id.
      *
-     * @param userId
+     * @param alexaUserId
      * @return {Promise<string>}
      */
-    async getUsername(userId) {
-        return (await this.#loadOrCreateUserData(userId)).getUsername();
+    async getUsername(alexaUserId) {
+        return (await this.#loadOrCreateUserData(alexaUserId)).getUsername();
     }
 
     /**
      * Returns whether the user specified by the user id is registered.
 
-     * @param userId
+     * @param alexaUserId
      * @return {Promise<boolean>}
      */
-    async isUserRegistered(userId) {
-        return (await this.#loadOrCreateUserData(userId)).isRegistered();
+    async isUserRegistered(alexaUserId) {
+        return (await this.#loadOrCreateUserData(alexaUserId)).isRegistered();
     }
 
     /**
      * Returns true if the user specified by the user id has exceeded the usage quota for the current month.
      *
-     * @param userId
+     * @param alexaUserId
      * @return {Promise<boolean>}
      */
-    async checkUserQuotaExceeded(userId) {
-        const userData = await this.#loadOrCreateUserData(userId);
+    async checkUserQuotaExceeded(alexaUserId) {
+        const userData = await this.#loadOrCreateUserData(alexaUserId);
         const currentMonth = new Date().getMonth();
         const usagesByMonth = userData.getUsagesByMonth();
         return usagesByMonth[currentMonth] > UNREGISTERED_USER_USAGE_QUOTA_PER_MONTH;
     }
 
     /**
-     * Increment the current usage count of the user specified by the user id by one.
-     * Immediately persists the updated usage count to the database.
+     * Increments the current usage count of the user specified by the user id by one.
+     * Immediately persists the updated usage count to the database if the user is not
+     * using an own API key. Otherwise, the count is only persisted when the
+     * user session ends gracefully (less precise but trade-off for saving DDB costs).
      *
-     * @param userId {string}
+     * @param alexaUserId {string}
+     * @param userApiKey {string}
      * @return {Promise<void>}
      */
-    async incrementUsageCount(userId) {
-        const userData = await this.#loadOrCreateUserData(userId);
+    async incrementUsageCount(alexaUserId, userApiKey) {
+        const userData = await this.#loadOrCreateUserData(alexaUserId);
         const currentMonth = new Date().getMonth();
         const usagesByMonth = userData.getUsagesByMonth();
         usagesByMonth[currentMonth] = usagesByMonth[currentMonth] + 1;
         // always set usage of next month to 0, be cautious with december though
         usagesByMonth[(currentMonth + 1) % 12] = 0;
         logger.debug("Incrementing usage count for unregistered user to " + usagesByMonth[currentMonth]);
-        await this.#updateUserData(userId, userData.getMessageHistory(), userData.getUsagesByMonth());
+        if (!userApiKey) {
+            // persist state immediately
+            await this.#updateUserData(alexaUserId, userData.getMessageHistory(), userData.getUsagesByMonth());
+        }
     }
 
     /**
      * Returns the API key of the user specified by the user id.
      * If no API key was set, returns undefined.
      *
-     * @param userId
+     * @param alexaUserId
      * @return {Promise<string|undefined>}
      */
-    async getApiKey(userId) {
-        const hashedUserId = this.getHashedUserId(userId);
-        let apiKey = this.getApiKeyFromCache(hashedUserId);
+    async getApiKey(alexaUserId) {
+        const hashedAlexaUserId = this.getHashedAlexaUserId(alexaUserId);
+        let apiKey = this.getApiKeyFromCache(hashedAlexaUserId);
         if (apiKey) {
             return apiKey;
         }
 
-        const apiKeyEncrypted = (await this.#loadOrCreateUserData(userId)).getApiKeyEncrypted();
+        const apiKeyEncrypted = (await this.#loadOrCreateUserData(alexaUserId)).getApiKeyEncrypted();
         if (!apiKeyEncrypted) {
             return undefined;
         }
 
-        apiKey = CryptoWrapper.decrypt(userId + hashedUserId + Environment.encryptedApiKeySalt, apiKeyEncrypted);
-        this.putApiKeyToCache(hashedUserId, apiKey);
+        apiKey = CryptoWrapper.decrypt(hashedAlexaUserId + Environment.encryptedApiKeySalt, apiKeyEncrypted);
+        this.putApiKeyToCache(hashedAlexaUserId, apiKey);
         logger.debug("Cached user API key")
         return apiKey;
     }
@@ -161,24 +183,24 @@ export class UserDataManager {
     /**
      * Returns the message history of the user specified by the user id.
      *
-     * @param userId {string}
+     * @param alexaUserId {string}
      * @return {Promise<{assistant: string, user: string}[]>}
      */
-    async getMessageHistory(userId) {
-        return (await this.#loadOrCreateUserData(userId)).getMessageHistory();
+    async getMessageHistory(alexaUserId) {
+        return (await this.#loadOrCreateUserData(alexaUserId)).getMessageHistory();
     }
 
     /**
      * Add a message pair to the message history of the user specified by the user id.
      * If more than 3 pairs are in the history, the oldest pair is removed.
      *
-     * @param userId {string}
+     * @param alexaUserId {string}
      * @param userMessage {string}
      * @param assistantMessage {string}
      * @return {Promise<void>}
      */
-    async addMessagePairToHistory(userId, userMessage, assistantMessage) {
-        const userData = await this.#loadOrCreateUserData(userId);
+    async addMessagePairToHistory(alexaUserId, userMessage, assistantMessage) {
+        const userData = await this.#loadOrCreateUserData(alexaUserId);
         const messageHistory = userData.getMessageHistory();
         messageHistory.push({user: userMessage, assistant: assistantMessage});
         // only keep max 3 pairs
@@ -187,81 +209,85 @@ export class UserDataManager {
         }
     }
 
-    async endSession(userId) {
-        const userData = this.userDataCache.get(this.getHashedUserId(userId))?.userData;
-        if ( !userData ) {
+    async endSession(alexaUserId) {
+        const userData = this.userDataCache.get(this.getHashedAlexaUserId(alexaUserId))?.userData;
+        if (!userData) {
             return;
         }
-        await this.#updateUserData(userId, userData.getMessageHistory(), userData.getUsagesByMonth());
+        await this.#updateUserData(alexaUserId, userData.getMessageHistory(), userData.getUsagesByMonth());
         logger.debug("Deleting current user data from caches");
-        this.userDataCache.delete(this.getHashedUserId(userId));
-        this.apiKeyCache.delete(this.getHashedUserId(userId));
-        this.userIdHashCache.delete(userId);
+        this.userDataCache.delete(this.getHashedAlexaUserId(alexaUserId));
+        this.apiKeyCache.delete(this.getHashedAlexaUserId(alexaUserId));
+        this.hashedAlexaUserIdCache.delete(alexaUserId);
     }
 
     /* Cache actions */
 
     /**
      * Put user data to the cache.
-     * @param hashedUserId
+     * @param hashedAlexaUserId
      * @param userData
      */
-    putUserDataToCache(hashedUserId, userData) {
-        // this.putCacheWithTtl(this.userDataCache, hashedUserId, {userData: userData});
-        this.userDataCache.set(hashedUserId, {userData: userData, timestamp: Date.now()});
+    putUserDataToCache(hashedAlexaUserId, userData) {
+        // this.putCacheWithTtl(this.userDataCache, hashedAlexaUserId, {userData: userData});
+        this.userDataCache.set(hashedAlexaUserId, {userData: userData, timestamp: Date.now()});
     }
 
     /**
      * Put a hashed user id to the cache.
-     * @param userId
-     * @param hashedUserId
+     * @param alexaUserId
+     * @param hashedAlexaUserId
      */
-    putHashedUserIdToCache(userId, hashedUserId) {
-        // this.putCacheWithTtl(this.userIdHashCache, userId, {hashedUserId: hashedUserId});
-        this.userIdHashCache.set(userId, {hashedUserId: hashedUserId, timestamp: Date.now()});
+    putHashedAlexaUserIdToCache(alexaUserId, hashedAlexaUserId) {
+        // this.putCacheWithTtl(this.userIdHashCache, alexaUserId, {hashedAlexaUserId: hashedAlexaUserId});
+        this.hashedAlexaUserIdCache.set(alexaUserId, {hashedAlexaUserId: hashedAlexaUserId, timestamp: Date.now()});
     }
 
     /**
      * Put an API key to the cache.
-     * @param hashedUserId
+     * @param hashedAlexaUserId
      * @param apiKey
      */
-    putApiKeyToCache(hashedUserId, apiKey) {
-        // this.putCacheWithTtl(this.apiKeyCache, hashedUserId, {apiKey: apiKey});
-        this.apiKeyCache.set(hashedUserId, {apiKey: apiKey, timestamp: Date.now()});
+    putApiKeyToCache(hashedAlexaUserId, apiKey) {
+        // this.putCacheWithTtl(this.apiKeyCache, hashedAlexaUserId, {apiKey: apiKey});
+        this.apiKeyCache.set(hashedAlexaUserId, {apiKey: apiKey, timestamp: Date.now()});
     }
 
     /**
      * Return the user data of the given hashed user id from the cache.
      * If the entry in the cache has expired, returns undefined.
      *
-     * @param hashedUserId
+     * This is only meant to be used for testing purposes.
+     * Other actions should be performed through this class only,
+     * as it encapsulates the database actions when required.
+     *
+     * @param hashedAlexaUserId
      * @return {UserData|undefined}
      */
-    getUserDataFromCache(hashedUserId) {
-        return this.#getFromCacheOrExpire(this.userDataCache, hashedUserId, USER_DATA_CACHE_TTL)?.userData;
+    getUserDataFromCache(hashedAlexaUserId) {
+        return this.#getFromCacheOrExpire(this.userDataCache, hashedAlexaUserId, USER_DATA_CACHE_TTL)?.userData;
     }
 
     /**
      * Return the hashed user id of the given user id from the cache.
      * If the entry in the cache has expired, returns undefined.
      *
-     * @param userId
+     * @param alexaUserId
      * @return {string|undefined}
      */
-    getHashedUserIdFromCache(userId) {
-        return this.#getFromCacheOrExpire(this.userIdHashCache, userId, USER_ID_HASH_CACHE_TTL)?.hashedUserId;
+    getHashedAlexaUserIdFromCache(alexaUserId) {
+        return this.#getFromCacheOrExpire(this.hashedAlexaUserIdCache, alexaUserId, USER_ID_HASH_CACHE_TTL)?.hashedAlexaUserId;
     }
 
     /**
      * Return the API key of the given hashed user id from the cache.
      * If the entry in the cache has expired, returns undefined.
      *
-     * @param hashedUserId
+     * @param hashedAlexaUserId
      * @return {string|undefined}
      */
-    getApiKeyFromCache(hashedUserId) {
-        return this.#getFromCacheOrExpire(this.apiKeyCache, hashedUserId, API_KEY_CACHE_TTL)?.apiKey;
+    getApiKeyFromCache(hashedAlexaUserId) {
+        return this.#getFromCacheOrExpire(this.apiKeyCache, hashedAlexaUserId, API_KEY_CACHE_TTL)?.apiKey;
     }
 
     /**
@@ -291,51 +317,51 @@ export class UserDataManager {
 
     /**
      * Load user data from cache or database. If user data does not exist, create a new entry.
-     * @param userId
+     * @param alexaUserId
      * @return {Promise<UserData>}
      */
-    async #loadOrCreateUserData(userId) {
-        // don't store userId directly, hash it first
-        const hashedUserId = this.getHashedUserId(userId);
+    async #loadOrCreateUserData(alexaUserId) {
+        // don't store alexaUserId directly, hash it first
+        const hashedAlexaUserId = this.getHashedAlexaUserId(alexaUserId);
 
-        let userData = this.getUserDataFromCache(hashedUserId);
+        let userData = this.getUserDataFromCache(hashedAlexaUserId);
         if (userData) {
             return userData;
         }
 
         // check if user exists
-        logger.debug('Request userId was not found in cache, checking if user exists in database');
-        const result = await this.dynamoDbClientWrapper.getItem(DYNAMO_DB_TABLE_NAME, DYNAMO_DB_PARTITION_KEY_NAME, hashedUserId);
+        logger.debug('Requested alexaUserId was not found in cache, checking if user exists in database');
+        const result = await this.dynamoDbClientWrapper.getItem(DYNAMO_DB_TABLE_NAME, DYNAMO_DB_PARTITION_KEY_NAME, hashedAlexaUserId);
         if (result?.Item) {
             logger.debug('Found user in database');
             const userData = new UserData({...result.Item});
-            this.putUserDataToCache(hashedUserId, userData);
+            this.putUserDataToCache(hashedAlexaUserId, userData);
             return userData;
         }
 
         // if user does not exist, create a new entry
         logger.debug('User not found in database, creating new entry')
         userData = new UserData({
-            hashedUserId: hashedUserId,
+            hashedAlexaUserId: hashedAlexaUserId,
             registered: false,
             apiKeyEncrypted: "",
             username: "",
             messageHistory: []
         });
         await this.dynamoDbClientWrapper.putItem(DYNAMO_DB_TABLE_NAME, this.#serializeUserDataForDb(userData));
-        this.putUserDataToCache(hashedUserId, userData);
+        this.putUserDataToCache(hashedAlexaUserId, userData);
         return userData;
     }
 
     /**
      * Updates the user data in the database with the current message history and current usage counts.
      *
-     * @param userId {string}
+     * @param alexaUserId {string}
      * @param messageHistory {Array<{assistant: string, user: string}>}
      * @param usagesByMonth {Array<number>}
      * @return {Promise<*>}
      */
-    async #updateUserData(userId, messageHistory, usagesByMonth) {
+    async #updateUserData(alexaUserId, messageHistory, usagesByMonth) {
         const updateExpression = "set #messageHistory = :messageHistory, #usagesByMonth = :usagesByMonth, #lastModified = :lastModified";
         const expressionAttributeNames = {
             "#messageHistory": "messageHistory",
@@ -349,19 +375,19 @@ export class UserDataManager {
         };
 
         return this.dynamoDbClientWrapper.updateItem(DYNAMO_DB_TABLE_NAME, DYNAMO_DB_PARTITION_KEY_NAME,
-            this.getHashedUserId(userId), updateExpression, expressionAttributeNames, expressionAttributeValues);
+            this.getHashedAlexaUserId(alexaUserId), updateExpression, expressionAttributeNames, expressionAttributeValues);
     }
 
     /**
      * Set the API key in the user data specified by the user id.
      *
-     * @param userId {string}
+     * @param alexaUserId {string}
      * @param apiKey {string}
      * @return {Promise<void>}
      */
-    async updateApiKey(userId, apiKey) {
-        const hashedUserId = this.getHashedUserId(userId);
-        const apiKeyEncrypted = apiKey ? CryptoWrapper.encrypt(userId + hashedUserId + Environment.encryptedApiKeySalt, apiKey) : "";
+    async updateApiKey(alexaUserId, apiKey) {
+        const hashedAlexaUserId = this.getHashedAlexaUserId(alexaUserId);
+        const apiKeyEncrypted = apiKey ? CryptoWrapper.encrypt(hashedAlexaUserId + Environment.encryptedApiKeySalt, apiKey) : "";
 
         const updateExpression = "set #apiKeyEncrypted = :apiKeyEncrypted, #lastModified = :lastModified";
         const expressionAttributeNames = {
@@ -374,7 +400,51 @@ export class UserDataManager {
         };
 
         return this.dynamoDbClientWrapper.updateItem(DYNAMO_DB_TABLE_NAME, DYNAMO_DB_PARTITION_KEY_NAME,
-            hashedUserId, updateExpression, expressionAttributeNames, expressionAttributeValues);
+            hashedAlexaUserId, updateExpression, expressionAttributeNames, expressionAttributeValues);
+    }
+
+    async purgeInactiveUsers() {
+        const inactiveUsers = await this.getInactiveUsers();
+        if (inactiveUsers.length === 0) {
+            return;
+        }
+        logger.info(`Purging ${inactiveUsers.length} inactive users`);
+        await Promise.all(
+            inactiveUsers.map(
+                async (userData) => {
+                    if (userData.isRegistered()) {
+                        await this.accountMappingsManager.deleteAccountMappingByUsername(userData.getUsername());
+                    }
+                    return this.dynamoDbClientWrapper.deleteItem(DYNAMO_DB_TABLE_NAME, DYNAMO_DB_PARTITION_KEY_NAME, userData.getHashedAlexaUserId());
+                }
+            )
+        );
+    }
+
+    /**
+     * Returns a list of all users that have been inactive for {@link DAYS_UNTIL_INACTIVE} days.
+     * @returns {Promise<UserData[]>}
+     */
+    async getInactiveUsers() {
+        const filterExpression = "#lastModified < :timestamp";
+        const expressionAttributeNames = {
+            "#lastModified": "lastModified"
+        };
+        const expressionAttributeValues = {
+            ":timestamp": Date.now() - MILLIS_UNTIL_INACTIVE
+        };
+
+        const result = await this.dynamoDbClientWrapper.scanAll(DYNAMO_DB_TABLE_NAME, filterExpression, expressionAttributeNames, expressionAttributeValues);
+        return result.map(item => {
+            return new UserData({...item});
+        });
+    }
+
+    async getAllUsers() {
+        const result = await this.dynamoDbClientWrapper.scanAll(DYNAMO_DB_TABLE_NAME);
+        return result.map(item => {
+            return new UserData({...item});
+        });
     }
 
     /**
@@ -384,7 +454,7 @@ export class UserDataManager {
      */
     #serializeUserDataForDb(userData) {
         return {
-            [DYNAMO_DB_PARTITION_KEY_NAME]: userData.getHashedUserId(),
+            [DYNAMO_DB_PARTITION_KEY_NAME]: userData.getHashedAlexaUserId(),
             lastModified: Date.now(),
             registered: userData.isRegistered(),
             apiKeyEncrypted: userData.getApiKeyEncrypted(),

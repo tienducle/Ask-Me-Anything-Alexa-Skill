@@ -1,11 +1,11 @@
-import {App} from "../../../src/app.mjs";
+import {AmaApp} from "../../../src/ama-app.mjs";
 import {expect} from "chai";
 
 describe("AskQuestionIntentHandler tests", () => {
 
     it("verify AskQuestionIntentHandler returns GPT response", async () => {
 
-        const app = new App();
+        const app = new AmaApp();
         let trigger = {
             "version": "1.0",
             "session": {

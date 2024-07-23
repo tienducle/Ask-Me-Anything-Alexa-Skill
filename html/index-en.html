@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Lexicon - API Key Update</title>
+</head>
+<body>
+<h1>Online Lexicon - (Alexa-Skill)</h1>
+<h5>formerly: AMA - Ask Me Anything</h5>
+<h4><a href="https://www.amazon.de/dp/B0D5HHK169/">Link to Skill</a></h4>
+<h4><a href="https://aws.pinguincloud.de/ama/data-privacy-en.html">Link to Privacy Policy</a></h4>
+<h2>Overview</h2>
+<p>Using the form below, you can configure your own OpenAI API key to be used with the skill. Say "Register" to obtain your personalized, generated login credentials and enter them in the form below.</p>
+<p>For more information about OpenAI API keys, please consult the <a href="https://help.openai.com/en/articles/4936850-where-do-i-find-my-openai-api-key">OpenAI documentation</a>.</p>
+<h4>Encryption Details</h4>
+<p>Your API key will be encrypted with your personal AWS UserId and an additional <a href="https://en.wikipedia.org/wiki/Salt_(cryptography)">Salt</a>.</p>
+<p>When you open the skill, the Lambda backend decrypts your API key into memory to use it for the OpenAI API requests.</p>
+<p>To delete your API key, submit the form below with an empty API key value.</p>
+<p>The full code will be available on Github in the next weeks.</p>
+<p>------</p>
+<form id="updateForm">
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" required><br><br>
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required><br><br>
+    <label for="apiKey">API Key:</label>
+    <input type="text" id="apiKey" name="apiKey" required><br><br>
+    <button type="button" onclick="sendRequest()">Send</button>
+</form>
+
+<script>
+    async function sendRequest() {
+        const username = document.getElementById('username').value;
+        const usernameBase64 = btoa(username);
+        const password = document.getElementById('password').value;
+        const apiKey = document.getElementById('apiKey').value;
+
+        const url = 'https://aws.pinguincloud.de/production/accounts/' + usernameBase64 + '/apiKey';
+
+        const basicAuth = 'Basic ' + btoa(`${username}:${password}`);
+        const bodyData = { apiKey: apiKey };
+
+        try {
+            const response = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': basicAuth,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(bodyData)
+            });
+
+            if (response.ok) {
+                alert('API Key updated successfully!');
+            } else {
+                alert('Failed to update API Key.');
+            }
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    }
+</script>
+</body>
+</html>

@@ -14,7 +14,7 @@ export class UserAccountMapping {
         return this.passwordHash;
     }
 
-    getUserIdEncrypted() {
+    getAlexaUserIdEncrypted() {
         return this.userIdEncrypted;
     }
 

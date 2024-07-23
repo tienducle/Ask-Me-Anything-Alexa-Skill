@@ -1,11 +1,11 @@
-import {App} from "../../../src/app.mjs";
+import {AmaApp} from "../../../src/ama-app.mjs";
 import {expect} from "chai";
 
 describe("LaunchRequestHandler tests", () => {
 
     it("verify LaunchRequestHandler returns English welcome message", async () => {
 
-        const app = new App();
+        const app = new AmaApp();
         const trigger = {
             "version": "1.0",
             "session": {
@@ -83,7 +83,7 @@ describe("LaunchRequestHandler tests", () => {
 
     it("verify LaunchRequestHandler returns German welcome message", async () => {
 
-        const app = new App();
+        const app = new AmaApp();
         const trigger = {
             "version": "1.0",
             "session": {
@@ -161,7 +161,7 @@ describe("LaunchRequestHandler tests", () => {
 
     it("verify LaunchRequestHandler returns default welcome message", async () => {
 
-        const app = new App();
+        const app = new AmaApp();
         const trigger = {
             "version": "1.0",
             "session": {

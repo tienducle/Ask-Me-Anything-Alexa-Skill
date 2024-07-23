@@ -1,0 +1,122 @@
+{
+  "resource": "/accounts/{username}/apiKey",
+  "path": "/accounts/MTIzNDU2IzEyMzQ=/apiKey",
+  "httpMethod": "PUT",
+  "headers": {
+    "Authorization": "Basic MTIzNDU2IzEyMzQ6bXlwYXNzOm15cGFzcw==",
+    "CloudFront-Forwarded-Proto": "https",
+    "CloudFront-Is-Desktop-Viewer": "true",
+    "CloudFront-Is-Mobile-Viewer": "false",
+    "CloudFront-Is-SmartTV-Viewer": "false",
+    "CloudFront-Is-Tablet-Viewer": "false",
+    "CloudFront-Viewer-ASN": "14340",
+    "CloudFront-Viewer-Country": "DE",
+    "Content-Type": "application/json; charset=utf-8",
+    "Host": "hfouzd8r05.execute-api.eu-west-1.amazonaws.com",
+    "User-Agent": "RapidAPI/4.2.2 (Macintosh; OS X/14.4.1) GCDHTTPRequest",
+    "Via": "1.1 999a435eb37a050d3de26fe63534c416.cloudfront.net (CloudFront)",
+    "X-Amz-Cf-Id": "6qd0hAJ11y81BlNhJOKs-uFz6T7_rsH-jQVJJDiaSN6HJBRQW8Jkgw==",
+    "X-Amzn-Trace-Id": "Root=1-66557c0f-32c64de45b0d48e63b1971eb",
+    "x-api-key": "abcdefg",
+    "X-Forwarded-For": "85.222.134.1, 130.176.0.76",
+    "X-Forwarded-Port": "443",
+    "X-Forwarded-Proto": "https"
+  },
+  "multiValueHeaders": {
+    "Authorization": [
+      "Basic MTIzNDU2IzEyMzQ6bXlwYXNzOm15cGFzcw=="
+    ],
+    "CloudFront-Forwarded-Proto": [
+      "https"
+    ],
+    "CloudFront-Is-Desktop-Viewer": [
+      "true"
+    ],
+    "CloudFront-Is-Mobile-Viewer": [
+      "false"
+    ],
+    "CloudFront-Is-SmartTV-Viewer": [
+      "false"
+    ],
+    "CloudFront-Is-Tablet-Viewer": [
+      "false"
+    ],
+    "CloudFront-Viewer-ASN": [
+      "14340"
+    ],
+    "CloudFront-Viewer-Country": [
+      "DE"
+    ],
+    "Content-Type": [
+      "application/json; charset=utf-8"
+    ],
+    "Host": [
+      "hfouzd8r05.execute-api.eu-west-1.amazonaws.com"
+    ],
+    "User-Agent": [
+      "RapidAPI/4.2.2 (Macintosh; OS X/14.4.1) GCDHTTPRequest"
+    ],
+    "Via": [
+      "1.1 999a435eb37a050d3de26fe63534c416.cloudfront.net (CloudFront)"
+    ],
+    "X-Amz-Cf-Id": [
+      "6qd0hAJ11y81BlNhJOKs-uFz6T7_rsH-jQVJJDiaSN6HJBRQW8Jkgw=="
+    ],
+    "X-Amzn-Trace-Id": [
+      "Root=1-66557c0f-32c64de45b0d48e63b1971eb"
+    ],
+    "x-api-key": [
+      "abcdefg"
+    ],
+    "X-Forwarded-For": [
+      "85.222.134.1, 130.176.0.76"
+    ],
+    "X-Forwarded-Port": [
+      "443"
+    ],
+    "X-Forwarded-Proto": [
+      "https"
+    ]
+  },
+  "queryStringParameters": null,
+  "multiValueQueryStringParameters": null,
+  "pathParameters": {
+    "username": "MTIzNDU2IzEyMzQ="
+  },
+  "stageVariables": null,
+  "requestContext": {
+    "resourceId": "r1bdpr",
+    "resourcePath": "/accounts/{username}/apiKey",
+    "httpMethod": "PUT",
+    "extendedRequestId": "YeBSaEdqDoEEa_g=",
+    "requestTime": "28/May/2024:06:39:11 +0000",
+    "path": "/production/accounts/MTIzNDU2IzEyMzQ=/apiKey",
+    "accountId": "361902846135",
+    "protocol": "HTTP/1.1",
+    "stage": "production",
+    "domainPrefix": "hfouzd8r05",
+    "requestTimeEpoch": 1716878351188,
+    "requestId": "885b630d-51f5-4c82-a269-95c368b26de3",
+    "identity": {
+      "cognitoIdentityPoolId": null,
+      "cognitoIdentityId": null,
+      "apiKey": "abcdef",
+      "principalOrgId": null,
+      "cognitoAuthenticationType": null,
+      "userArn": null,
+      "apiKeyId": "8lan8powyh",
+      "userAgent": "RapidAPI/4.2.2 (Macintosh; OS X/14.4.1) GCDHTTPRequest",
+      "accountId": null,
+      "caller": null,
+      "sourceIp": "85.222.134.1",
+      "accessKey": null,
+      "cognitoAuthenticationProvider": null,
+      "user": null
+    },
+    "domainName": "hfouzd8r05.execute-api.eu-west-1.amazonaws.com",
+    "deploymentId": "xudg3g",
+    "apiId": "hfouzd8r05"
+  },
+  "body": "{\"apiKeyBase64\":\"bXlrZXlteWtleQ==\"}",
+  "isBase64Encoded": false
+}

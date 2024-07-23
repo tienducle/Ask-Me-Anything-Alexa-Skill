@@ -26,8 +26,8 @@ export class SessionEndedRequestHandler {
     async handle(handlerInput) {
         // Any clean-up logic goes here.
         logger.debug("Persisting user data before ending session");
-        const userId = Alexa.getUserId(handlerInput.requestEnvelope);
-        await this.userDataManager.endSession(userId);
+        const alexaUserId = Alexa.getUserId(handlerInput.requestEnvelope);
+        await this.userDataManager.endSession(alexaUserId);
 
         return handlerInput.responseBuilder.getResponse();
     }

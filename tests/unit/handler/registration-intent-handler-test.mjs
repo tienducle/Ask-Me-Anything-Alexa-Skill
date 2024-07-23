@@ -1,10 +1,10 @@
-import {App} from "../../../src/app.mjs";
+import {AmaApp} from "../../../src/ama-app.mjs";
 import {expect} from "chai";
 
 describe("RegistrationIntentHandler tests", () => {
 
     it("verify RegistrationIntentHandler returns expected credentials", async () => {
-        const app = new App();
+        const app = new AmaApp();
         const trigger = {
             "version": "1.0",
             "session": {
@@ -116,7 +116,7 @@ describe("RegistrationIntentHandler tests", () => {
         expect(response.response.card.content).to.contain("You can set up your own API Key at https://link.pinguincloud.de/ama-en\n");
         expect(response.response.card.content).to.contain("Use the following credentials:\n");
         expect(response.response.card.content).to.contain("Username: 3254680#");
-        expect(response.response.card.content).to.contain("Password: 2btTMtvR2TzuJgHt");
+        expect(response.response.card.content).to.contain("Password: pbxUmPPUntanM5dR");
     });
 
 });

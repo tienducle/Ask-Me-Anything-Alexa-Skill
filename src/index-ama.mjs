@@ -1,5 +1,5 @@
-import {App} from "./app.mjs";
-const app = new App();
+import {AmaApp} from "./ama-app.mjs";
+const app = new AmaApp();
 
 export const handler = async ( lambdaTriggerPayload, context ) => {
     return app.handle( lambdaTriggerPayload, context );

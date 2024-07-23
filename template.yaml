@@ -10,62 +10,67 @@ Globals:
     MemorySize: 4096
 
 Parameters:
-    LogLevel:
-        Type: String
-        Default: error
-        AllowedValues:
-        - error
-        - warn
-        - info
-        - debug
-    OpenAiApiKey:
-        Type: String
-    OpenAiModel:
-        Type: String
-        Default: "gpt-4o"
-    DynamoDbEndpointOverride:
-      Type: String
-      Default: ""
-    DynamoDbRegion:
-      Type: String
-      Default: "eu-west-1"
-    DynamoDbUserDataTableName:
-        Type: String
-        Default: "AskMeAnything-UserData"
-    DynamoDbUserDataTablePartitionKeyName:
-        Type: String
-        Default: "id"
-    DynamoDbAccountMappingsTableName:
-        Type: String
-        Default: "AskMeAnything-AccountMappings"
-    DynamoDbAccountMappingsTablePartitionKeyName:
-        Type: String
-        Default: "id"
-    UsernameSalt:
-        Type: String
-    PasswordSalt:
-        Type: String
-    EncryptedUserIdSalt:
-        Type: String
-    EncryptedApiKeySalt:
-      Type: String
+  # Skill
+  OpenAiApiKey:
+    Type: String
+  OpenAiModel:
+    Type: String
+    Default: "gpt-4o"
+  # Skill + Backend
+  LogLevel:
+    Type: String
+    Default: error
+    AllowedValues:
+      - error
+      - warn
+      - info
+      - debug
+  #    DynamoDbEndpointOverride:
+  #      Type: String
+  #      Default: ""
+  DynamoDbRegion:
+    Type: String
+    Default: "eu-west-1"
+  DynamoDbUserDataTableName:
+    Type: String
+    Default: "AskMeAnything-UserData"
+  DynamoDbUserDataTablePartitionKeyName:
+    Type: String
+    Default: "id"
+  DynamoDbAccountMappingsTableName:
+    Type: String
+    Default: "AskMeAnything-AccountMappings"
+  DynamoDbAccountMappingsTablePartitionKeyName:
+    Type: String
+    Default: "id"
+  UsernameSalt:
+    Type: String
+  PasswordSalt:
+    Type: String
+  EncryptedUserIdSalt:
+    Type: String
+  EncryptedApiKeySalt:
+    Type: String
 
 Resources:
+  ############
+  # Lambda for Alexa Skill
+  ############
   AskMeAnything:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: ./
-      Handler: src/index.handler
+      Handler: src/index-ama.handler
       Runtime: nodejs20.x
       Architectures:
-      - x86_64
+        - x86_64
       Environment:
         Variables:
           LOG_LEVEL: !Ref LogLevel
           LOG_LEVEL_LOCALE_SERVICE: "warn"
-          GPT_OPEN_AI_API_KEY: !Ref OpenAiApiKey
-          GPT_OPEN_AI_MODEL: !Ref OpenAiModel
-          DYNAMO_DB_ENDPOINT_OVERRIDE: !Ref DynamoDbEndpointOverride
+          OPEN_AI_API_KEY: !Ref OpenAiApiKey
+          OPEN_AI_MODEL: !Ref OpenAiModel
+          #          DYNAMO_DB_ENDPOINT_OVERRIDE: !Ref DynamoDbEndpointOverride
           DYNAMO_DB_REGION: !Ref DynamoDbRegion
           DYNAMO_DB_USER_DATA_TABLE_NAME: !Ref DynamoDbUserDataTableName
           DYNAMO_DB_USER_DATA_TABLE_PARTITION_KEY_NAME: !Ref DynamoDbUserDataTablePartitionKeyName
@@ -106,10 +111,89 @@ Resources:
           KeyType: HASH
       BillingMode: PAY_PER_REQUEST
 
+  ############
+  # Backend
+  ############
+  AmaBackendLambdaUsagePlan:
+    Type: AWS::ApiGateway::UsagePlan
+    Properties:
+      ApiStages:
+        - ApiId: !Ref AmaBackendApiGateway
+          Stage: production
+      Description: "Usage plan for AskMeAnything Lambda function"
+      Quota:
+        Limit: 5000
+        Period: MONTH
+      Throttle:
+        BurstLimit: 1000
+        RateLimit: 100
+  AmaBackendLambdaApiKey:
+    Type: AWS::ApiGateway::ApiKey
+    Properties:
+      Description: "API Key for AskMeAnything Lambda function to access AmaBackend"
+      Enabled: true
+  AmaBackendLambdaUsagePlanKey:
+    Type: AWS::ApiGateway::UsagePlanKey
+    Properties:
+      KeyId: !Ref AmaBackendLambdaApiKey
+      KeyType: API_KEY
+      UsagePlanId: !Ref AmaBackendLambdaUsagePlan
+  AmaBackendApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: production
+  AmaBackend:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: ./
+      Handler: src/index-ama-backend.handler
+      Runtime: nodejs20.x
+      Architectures:
+        - x86_64
+      Events:
+        UpdateAccountApiKeyEvent:
+          Type: Api
+          Properties:
+            Path: /accounts/{username}/apiKey
+            Method: put
+            Auth:
+              ApiKeyRequired: true
+            RestApiId:
+              Ref: AmaBackendApiGateway
+      Environment:
+        Variables:
+          LOG_LEVEL: !Ref LogLevel
+          LOG_LEVEL_LOCALE_SERVICE: "warn"
+          DYNAMO_DB_REGION: !Ref DynamoDbRegion
+          DYNAMO_DB_USER_DATA_TABLE_NAME: !Ref DynamoDbUserDataTableName
+          DYNAMO_DB_USER_DATA_TABLE_PARTITION_KEY_NAME: !Ref DynamoDbUserDataTablePartitionKeyName
+          DYNAMO_DB_ACCOUNT_MAPPINGS_TABLE_NAME: !Ref DynamoDbAccountMappingsTableName
+          DYNAMO_DB_ACCOUNT_MAPPINGS_TABLE_PARTITION_KEY_NAME: !Ref DynamoDbAccountMappingsTablePartitionKeyName
+          USERNAME_SALT: !Ref UsernameSalt
+          PASSWORD_SALT: !Ref PasswordSalt
+          ENCRYPTED_USER_ID_SALT: !Ref EncryptedUserIdSalt
+          ENCRYPTED_API_KEY_SALT: !Ref EncryptedApiKeySalt
+  AmaBackendLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${AmaBackend}"
+      RetentionInDays: 1
+
 Outputs:
+  # Skill
   AskMeAnything:
     Description: AskMeAnything Lambda Function ARN
     Value: !GetAtt AskMeAnything.Arn
   AskMeAnythingIamRole:
     Description: Implicit IAM Role created for AskMeAnything Lambda Function
     Value: !GetAtt AskMeAnythingRole.Arn
+  # Backend
+  AmaBackend:
+    Description: AmaBackend Lambda Function ARN
+    Value: !GetAtt AmaBackend.Arn
+  AmaBackendIamRole:
+    Description: Implicit IAM Role created for AMA Backend Lambda Function
+    Value: !GetAtt AmaBackendRole.Arn
+  AmaBackendEndpoint:
+    Description: "AmaBackendEndpoint"
+    Value: !Sub "https://${AmaBackendApiGateway}.execute-api.${AWS::Region}.amazonaws.com/production"

@@ -35,10 +35,10 @@ export class LaunchRequestHandler {
         }
 
         const locale = handlerInput.requestEnvelope._internal.locale;
-        const userId = Alexa.getUserId(handlerInput.requestEnvelope);
+        const alexaUserId = Alexa.getUserId(handlerInput.requestEnvelope);
 
         try {
-            const userDataExists = await this.userDataManager.ensureUserDataEntryExists(userId);
+            const userDataExists = await this.userDataManager.ensureUserDataEntryExists(alexaUserId);
             if (!userDataExists) {
                 logger.error('Unable to load user account.');
                 return this.respondWithCouldNotCreateUserAccountError(handlerInput);

@@ -15,8 +15,8 @@ export class Environment {
         this._encryptedUserIdSalt = process.env.ENCRYPTED_USER_ID_SALT;
         this._encryptedApiKeySalt = process.env.ENCRYPTED_API_KEY_SALT;
 
-        this._gptOpenAiApiKey = process.env.GPT_OPEN_AI_API_KEY;
-        this._gptOpenAiModel = process.env.GPT_OPEN_AI_MODEL || 'gpt-4o';
+        this._openAiApiKey = process.env.OPEN_AI_API_KEY;
+        this._openAiModel = process.env.OPEN_AI_MODEL || 'gpt-4o';
         this._unregisteredUsersUsageQuotaPerMonth = process.env.UNREGISTERED_USERS_USAGE_QUOTA_PER_MONTH || 50;
     }
 
@@ -60,12 +60,12 @@ export class Environment {
         return this._encryptedApiKeySalt;
     }
 
-    get gptOpenAiApiKey() {
-        return this._gptOpenAiApiKey;
+    get openAiApiKey() {
+        return this._openAiApiKey;
     }
 
-    get gptOpenAiModel() {
-        return this._gptOpenAiModel;
+    get openAiModel() {
+        return this._openAiModel;
     }
 
     get unregisteredUsersUsageQuotaPerMonth() {

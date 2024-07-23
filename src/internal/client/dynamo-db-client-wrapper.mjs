@@ -1,5 +1,7 @@
-import {CreateTableCommand, DynamoDBClient, ListTablesCommand} from "@aws-sdk/client-dynamodb";
-import {DynamoDBDocumentClient, GetCommand, PutCommand, UpdateCommand} from "@aws-sdk/lib-dynamodb";
+import {CreateTableCommand, DeleteTableCommand, DynamoDBClient, ListTablesCommand} from "@aws-sdk/client-dynamodb";
+import {
+    DynamoDBDocumentClient, GetCommand, PutCommand, UpdateCommand, ScanCommand, DeleteCommand
+} from "@aws-sdk/lib-dynamodb";
 import {Logger} from "../logger.mjs";
 
 const logger = new Logger('DynamoDbClientWrapper', process.env.LOG_LEVEL_DYNAMO_DB_CLIENT_WRAPPER);
@@ -22,14 +24,15 @@ export class DynamoDbClientWrapper {
         this.documentClient = DynamoDBDocumentClient.from(this.dynamoDBClient);
     }
 
-    async createTable(tableName, keySchemaList, attributeDefinitionList, provisionedThroughput) {
+    async createTable(tableName, keySchemaList, attributeDefinitionList, globalSecondaryIndexes, provisionedThroughput) {
         const createTableCommand = new CreateTableCommand({
             TableName: tableName,
             KeySchema: keySchemaList,
             AttributeDefinitions: attributeDefinitionList,
+            GlobalSecondaryIndexes: globalSecondaryIndexes ? globalSecondaryIndexes : undefined,
             ProvisionedThroughput: provisionedThroughput ? provisionedThroughput : {
                 ReadCapacityUnits: 5, WriteCapacityUnits: 5
-            }
+            },
         });
         await this.dynamoDBClient.send(createTableCommand).catch((error) => {
             logger.error(`Could not create table (${tableName}): ${error.message}`);
@@ -41,10 +44,29 @@ export class DynamoDbClientWrapper {
         return this.dynamoDBClient.send(listTablesCommand);
     }
 
+    async deleteTable(tableName) {
+        const deleteTableCommand = new DeleteTableCommand({
+            TableName: tableName
+        });
+        return this.dynamoDBClient.send(deleteTableCommand);
+    }
+
+    async purgeTable(tableName) {
+        const items = await this.scanAll(tableName);
+
+        for (const item of items) {
+            const deleteCommand = new DeleteCommand({
+                TableName: tableName, Key: {
+                    [this.partitionKeyName]: item[this.partitionKeyName]
+                }
+            });
+            await this.documentClient.send(deleteCommand);
+        }
+    }
+
     async putItem(tableName, item) {
         const putCommand = new PutCommand({
-            TableName: tableName,
-            Item: item
+            TableName: tableName, Item: item
         });
         return this.documentClient.send(putCommand);
     }
@@ -71,6 +93,44 @@ export class DynamoDbClientWrapper {
         return this.documentClient.send(getCommand);
     }
 
+    async deleteItem(tableName, keyName, keyValue) {
+        const deleteCommand = new DeleteCommand({
+            TableName: tableName, Key: {
+                [keyName]: keyValue
+            }
+        });
+        return this.documentClient.send(deleteCommand);
+    }
+
+    /**
+     * Scan all items in a table
+     * @param tableName {string}
+     * @param filterExpression
+     * @param expressionAttributeNames
+     * @param expressionAttributeValues
+     * @param pointer
+     * @returns {Promise<*[]|*>}
+     */
+    async scanAll(tableName, filterExpression, expressionAttributeNames, expressionAttributeValues, pointer) {
+
+        const scanCommand = new ScanCommand({
+            TableName: tableName,
+            FilterExpression: filterExpression,
+            ExpressionAttributeNames: expressionAttributeNames,
+            ExpressionAttributeValues: expressionAttributeValues,
+            ExclusiveStartKey: pointer
+        });
+
+        try {
+            const data = await this.documentClient.send(scanCommand);
+            return data.LastEvaluatedKey ? [...data.Items, ...await this.scanAll(tableName, data.LastEvaluatedKey, filterExpression, expressionAttributeNames, expressionAttributeValues)] : data.Items;
+
+        } catch (error) {
+            console.log("An error occurred while executing SCAN command:", error);
+        }
+
+        return [];
+    }
 }
 
 

@@ -39,13 +39,13 @@ export class RegistrationIntentHandler {
         }
 
         const locale = handlerInput.requestEnvelope._internal.locale;
-        const userId = Alexa.getUserId(handlerInput.requestEnvelope);
+        const alexaUserId = Alexa.getUserId(handlerInput.requestEnvelope);
 
-        if (!await this.userDataManager.isUserRegistered(userId)) {
+        if (!await this.userDataManager.isUserRegistered(alexaUserId)) {
             logger.debug('User is not registered yet. Starting registration flow.');
             let registrationSucceeded = false;
             try {
-                registrationSucceeded = await this.userDataManager.registerUserAccountMapping(userId);
+                registrationSucceeded = await this.userDataManager.registerUserAccountMapping(alexaUserId);
             } catch (error) {
                 logger.error(`Error while creating account mapping: ${error}`);
             }
@@ -56,14 +56,15 @@ export class RegistrationIntentHandler {
             }
         }
 
-        const username = await this.userDataManager.getUsername(userId);
-        const userPassword = this.userAccountMappingsManager.generateUserPassword(userId)
+        const username = await this.userDataManager.getUsername(alexaUserId);
+        const hashedAlexaUserId = this.userDataManager.getHashedAlexaUserId(alexaUserId);
+        const userPassword = this.userAccountMappingsManager.generateUserPassword(hashedAlexaUserId)
 
         const texts = LocaleService.getLocalizedTexts(locale, "handler.registration.successInfo");
         texts.cardContent = this.replaceCredentialsInText(texts.cardContent, username, userPassword)
 
         logger.debug("Persisting user data before ending session");
-        await this.userDataManager.endSession(userId);
+        await this.userDataManager.endSession(alexaUserId);
 
         return this.respond(handlerInput, texts);
     }

@@ -1,9 +1,9 @@
-import {App} from "../../src/app.mjs";
+import {AmaApp} from "../../src/ama-app.mjs";
 import {expect} from "chai";
 import {DynamoDbClientWrapper} from "../../src/internal/client/dynamo-db-client-wrapper.mjs";
 import Environment from "../../src/environment.mjs";
 
-describe("App tests", () => {
+describe("AmaApp tests", () => {
 
     const ddbConfig = {
         region: "eu-west-1",
@@ -28,7 +28,7 @@ describe("App tests", () => {
 
     it("verify default trigger returns welcome message", async () => {
 
-        const app = new App();
+        const app = new AmaApp();
         const trigger = {
             "version": "1.0",
             "session": {

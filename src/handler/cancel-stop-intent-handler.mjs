@@ -33,8 +33,8 @@ export class CancelStopIntentHandler {
         }
 
         logger.debug("Persisting user data before ending session");
-        const userId = Alexa.getUserId(handlerInput.requestEnvelope);
-        await this.userDataManager.endSession(userId);
+        const alexaUserId = Alexa.getUserId(handlerInput.requestEnvelope);
+        await this.userDataManager.endSession(alexaUserId);
 
         const locale = handlerInput.requestEnvelope._internal.locale;
         const texts = LocaleService.getLocalizedTexts(locale, 'handler.cancelStop.text');

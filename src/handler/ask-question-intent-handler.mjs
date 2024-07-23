@@ -53,14 +53,14 @@ export class AskQuestionIntentHandler {
             SERVICE_INSTANCE.SERVICE = this.initializeService();
         }
 
-        const userId = Alexa.getUserId(handlerInput.requestEnvelope)
+        const alexaUserId = Alexa.getUserId(handlerInput.requestEnvelope)
         const locale = handlerInput.requestEnvelope._internal.locale;
 
-        const userApiKey = await this.userDataManager.getApiKey(userId);
+        const userApiKey = await this.userDataManager.getApiKey(alexaUserId);
         if ( !userApiKey )
         {
             // check user quota
-            if (await this.userDataManager.checkUserQuotaExceeded(userId))
+            if (await this.userDataManager.checkUserQuotaExceeded(alexaUserId))
             {
                 const quotaExceededTexts = LocaleService.getLocalizedTexts(locale, "handler.askQuestion.quotaReached");
                 return handlerInput.responseBuilder
@@ -73,15 +73,12 @@ export class AskQuestionIntentHandler {
         const query = handlerInput.requestEnvelope.request.intent.slots.query?.value || handlerInput.requestEnvelope.request.intent.slots.fullQuery?.value;
         const answer = await SERVICE_INSTANCE.SERVICE.getAnswer(
             userApiKey,
-            await this.userDataManager.getMessageHistory(userId),
+            await this.userDataManager.getMessageHistory(alexaUserId),
             query, locale
         );
 
-        await this.userDataManager.addMessagePairToHistory(userId, query, answer);
-        if (!userApiKey)
-        {
-            await this.userDataManager.incrementUsageCount(userId);
-        }
+        await this.userDataManager.addMessagePairToHistory(alexaUserId, query, answer);
+        await this.userDataManager.incrementUsageCount(alexaUserId, userApiKey);
 
         const answerPrefixTexts = LocaleService.getLocalizedTexts(locale, "handler.askQuestion.answerPrefixText");
         const repromptTexts = LocaleService.getLocalizedTexts(locale, "handler.askQuestion.repromptText");

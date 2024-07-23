@@ -1,7 +1,7 @@
 export class UserData {
 
     constructor(data) {
-        this.hashedUserId = data?.id ? data.id : data?.hashedUserId;
+        this.hashedAlexaUserId = data?.id ? data.id : data?.hashedAlexaUserId;
         this.lastModified = data?.lastModified;
         this.registered = data?.registered || false;
         this.apiKeyEncrypted = data?.apiKeyEncrypted;
@@ -10,8 +10,8 @@ export class UserData {
         this.usagesByMonth = data?.usagesByMonth || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     };
 
-    getHashedUserId() {
-        return this.hashedUserId;
+    getHashedAlexaUserId() {
+        return this.hashedAlexaUserId;
     }
 
     getLastModified() {

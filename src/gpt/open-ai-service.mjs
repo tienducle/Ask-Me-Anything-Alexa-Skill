@@ -3,8 +3,8 @@ import LocaleService from "../internal/locale-service.mjs";
 import {Logger} from "../internal/logger.mjs";
 
 const logger = new Logger('OpenAiService', process.env.LOG_LEVEL_OPEN_AI_SERVICE);
-const API_KEY = Environment.gptOpenAiApiKey
-const MODEL = Environment.gptOpenAiModel
+const API_KEY = Environment.openAiApiKey
+const MODEL = Environment.openAiModel
 
 const API_HOSTNAME = 'api.openai.com';
 const API_VERSION = 'v1';

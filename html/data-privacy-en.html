@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Lexicon - Privacy Policy</title>
+</head>
+<body>
+<h1>Online Lexicon (Alexa-Skill)</h1>
+<h4><a href="https://www.amazon.de/dp/B0D5HHK169/">Link to Skill</a></h4>
+<h4><a href="https://aws.pinguincloud.de/ama/index-en.html">Link to main page</a></h4>
+</br>
+<h2>Privacy Policy</h2>
+<h2>Overview</h2>
+On the web page https://link.pinguincloud.de/ama-en [1] you will be asked to enter additional information that are required to use the Alexa-Skill "Online Lexicon", <b>if</b> you want to use your own OpenAPI API key.
+<h2>Stored data</h2>
+<h3>Use without own API key</h3>
+<b>id</b> - The ASK-SDK automatically generates a unique user ID. This ID is unique for each skill, that is in use by the user. The ID is only stored as a SHA-512 hash.<br>
+<b>messageHistory</b> - Up to 3 messages, that were sent by the user, will be stored and used in the OpenAI API requests, to allow the user to ask follow-up questions and provide more context to the GPT model.<br>
+<b>usagesByMonth</b> - List with twelve entries, which store the count of requests that were made by the user, to enforce the maximum quota of 30 requests per month. The counter of the upcoming month is always resetted to zero.<br>
+<h3>Use with own API key</h3>
+<b>apiKey</b> - The API key is stored encrypted using the SHA-512 hash of the user ID and an additional salt. The API key is only decrypted in-memory by the AWS Lambda backend to send requests to the OpenAI API.<br>
+<h2>User Identification</h2>
+Every user, that activates the skill, gets an individual "Skill User ID" assigned by Amazon Alexa. Your user profile is stored under this ID.
+A conclusion from this "Skill User ID" to your identity or your Amazon username is not possible to my knowledge.
+If you deactivate and reactivate the skill, a new "Skill User ID" will be assigned to you.
+No IP addresses or address information is stored in your user profile.
+<h2>Right to erasure</h2>
+You can request a complete deletion of your user profile at any time.
+Just say "Register" to the Alexa skill and send me an email with the instruction to delete your user profile and provide the generated login credentials that you received.
+In addition, all records that have not been changed in the database for 90 days (e.g. if the user has not used the skill within 90 days) will be automatically deleted.
+<h2>Contact</h2>
+<a href="mailto:" eaten-went0p@icloud.com"="">eaten-went0p@icloud.com</a>
+
+<h4>Footnotes</h4>
+<h6>[1] As well as https://aws.pinguincloud.de/ama/index-en.html</h6>
+</body>
+</html>

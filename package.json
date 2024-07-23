@@ -5,23 +5,23 @@
   "license": "MIT",
   "type": "module",
   "dependencies": {
+    "18": "^0.0.0",
     "ask-sdk-core": "^2.14.0",
     "ask-sdk-dynamodb-persistence-adapter": "^2.14.0",
     "ask-sdk-model": "^1.86.0",
     "base-x": "^4.0.0",
-    "bcryptjs": "^2.4.3"
+    "bcryptjs": "^2.4.3",
+    "path": "^0.12.7"
   },
   "scripts": {
-    "tests": "export $(cat test_env_common.sh $@ | xargs); export $(cat test_env_local.sh $@ | xargs); LOG_LEVEL=$LOG_LEVEL ./node_modules/.bin/mocha 'tests/**/*-test.mjs' --timeout 60000",
-    "tests-with-coverage-no-stdout": "nyc --silent --no-clean npm run tests",
-    "tests-with-coverage": "nyc npm run tests",
-    "coverage-report": "nyc report"
+    "tests": "export $(cat test_env_common.sh $@ | xargs); export $(cat test_env_local.sh $@ | xargs); LOG_LEVEL=$LOG_LEVEL mocha 'tests/**/*-test.mjs' --timeout 60000",
+    "tests-with-coverage": "c8 npm run tests"
   },
   "devDependencies": {
     "@aws-sdk/client-dynamodb": "^3.584.0",
     "@aws-sdk/lib-dynamodb": "^3.584.0",
-    "chai": "^4.3.6",
-    "mocha": "^10.2.0",
-    "nyc": "^15.1.0"
+    "c8": "^10.1.2",
+    "chai": "^5.1.1",
+    "mocha": "^10.7.0"
   }
 }

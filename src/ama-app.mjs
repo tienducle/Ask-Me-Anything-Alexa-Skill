@@ -19,14 +19,13 @@ import {UserAccountMappingsManager} from "./internal/persistence/user-account-ma
 /**
  * LOG_LEVEL: error|debug
  */
-const logger = new Logger("App", process.env.LOG_LEVEL_APP);
+const logger = new Logger("AmaApp", process.env.LOG_LEVEL_APP);
 
-export class App {
+export class AmaApp {
 
     /**
      */
     constructor() {
-
         logger.debug(`Initializing app`);
 
         const dynamoDbClientConfig = {
