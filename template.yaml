@@ -51,6 +51,12 @@ Parameters:
     Type: String
   EncryptedApiKeySalt:
     Type: String
+  GooglePseSearchEngineId:
+    Type: String
+  GooglePseApiKey:
+    Type: String
+  CustomSearchEngineBlocklist:
+    Type: String
 
 Resources:
   ############
@@ -80,6 +86,9 @@ Resources:
           PASSWORD_SALT: !Ref PasswordSalt
           ENCRYPTED_USER_ID_SALT: !Ref EncryptedUserIdSalt
           ENCRYPTED_API_KEY_SALT: !Ref EncryptedApiKeySalt
+          GOOGLE_PSE_SEARCH_ENGINE_ID: !Ref GooglePseSearchEngineId
+          GOOGLE_PSE_API_KEY: !Ref GooglePseApiKey
+          CUSTOM_SEARCH_ENGINE_BLOCKLIST: !Ref CustomSearchEngineBlocklist
 
   AskMeAnythingLogGroup:
     Type: AWS::Logs::LogGroup

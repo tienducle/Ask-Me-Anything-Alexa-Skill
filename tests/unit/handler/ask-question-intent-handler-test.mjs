@@ -1,302 +1,78 @@
 import {AmaApp} from "../../../src/ama-app.mjs";
 import {expect} from "chai";
+import {TestIntentHelper} from "../../utils/test-intent-helper.mjs";
+import {UserDataManager} from "../../../src/internal/persistence/user-data-manager.mjs";
+import {DynamoDbClientWrapper} from "../../../src/internal/client/dynamo-db-client-wrapper.mjs";
+import {UserAccountMappingsManager} from "../../../src/internal/persistence/user-account-mappings-manager.mjs";
+import {Common} from "../common.mjs";
+import {Logger} from "../../../src/internal/logger.mjs";
+
+const logger = new Logger('AskQuestionIntentHandlerTest', process.env.LOG_LEVEL_ASK_QUESTION_INTENT_HANDLER_TEST);
 
 describe("AskQuestionIntentHandler tests", () => {
 
-    it("verify AskQuestionIntentHandler returns GPT response", async () => {
+    before( async function () {
+        await Common.setup();
+    } );
 
+    it("verify AskQuestionIntentHandler returns GPT response", async () => {
         const app = new AmaApp();
-        let trigger = {
-            "version": "1.0",
-            "session": {
-                "new": false,
-                "sessionId": "amzn1.echo-api.session.e4cfda26-302e-4fb1-b2e8-65ec7542ec50",
-                "application": {
-                    "applicationId": "amzn1.ask.skill.af36b546-6640-4e26-850d-5f5a7a71eb37"
-                },
-                "attributes": {},
-                "user": {
-                    "userId": "amzn1.ask.account.myuserid"
-                },
-                "affiliatedResources": []
-            },
-            "context": {
-                "Viewport": {
-                    "experiences": [
-                        {
-                            "arcMinuteWidth": 0,
-                            "arcMinuteHeight": 0,
-                            "canRotate": false,
-                            "canResize": false
-                        }
-                    ],
-                    "mode": "MOBILE",
-                    "shape": "RECTANGLE",
-                    "pixelWidth": 3200,
-                    "pixelHeight": 1440,
-                    "dpi": 0,
-                    "currentPixelWidth": 3200,
-                    "currentPixelHeight": 1440,
-                    "touch": [
-                        "SINGLE"
-                    ],
-                    "keyboard": [
-                        "DIRECTION"
-                    ]
-                },
-                "Extensions": {
-                    "available": {}
-                },
-                "Advertising": {
-                    "advertisingId": "00000000-0000-0000-0000-000000000000",
-                    "limitAdTracking": true
-                },
-                "System": {
-                    "application": {
-                        "applicationId": "amzn1.ask.skill.af36b546-6640-4e26-850d-5f5a7a71eb37"
-                    },
-                    "user": {
-                        "userId": "amzn1.ask.account.myuserid"
-                    },
-                    "device": {
-                        "deviceId": "amzn1.ask.device.mydeviceid",
-                        "supportedInterfaces": {
-                            "Geolocation": {}
-                        }
-                    },
-                    "apiEndpoint": "https://api.eu.amazonalexa.com",
-                    "apiAccessToken": "sometoken"
-                }
-            },
-            "request": {
-                "type": "IntentRequest",
-                "requestId": "amzn1.echo-api.request.b3372b52-7263-4081-99ce-7b99899f0b57",
-                "locale": "de-DE",
-                "timestamp": "2024-05-25T16:46:23Z",
-                "intent": {
-                    "name": "AskQuestionIntent",
-                    "confirmationStatus": "NONE",
-                    "slots": {
-                        "fullQuery": {
-                            "name": "query",
-                            "value": "Wie viel sind 2+2",
-                            "resolutions": {
-                                "resolutionsPerAuthority": [
-                                    {
-                                        "authority": "AlexaEntities",
-                                        "status": {
-                                            "code": "ER_SUCCESS_NO_MATCH"
-                                        }
-                                    }
-                                ]
-                            },
-                            "confirmationStatus": "NONE",
-                            "source": "USER"
-                        }
-                    }
-                }
-            }
-        }
+        let trigger = TestIntentHelper.getAskQuestionIntent("Wie viel sind 2+2");
 
         let response = await app.handle(trigger);
         console.log("Response: " + response.response.outputSpeech.ssml)
         expect(response.response.outputSpeech.ssml).to.not.equal("<speak>Tut mir Leid, ich konnte deine Eingabe nicht verstehen.</speak>");
         expect(response.response.outputSpeech.ssml).to.contain("4");
 
-        trigger = {
-            "version": "1.0",
-            "session": {
-                "new": false,
-                "sessionId": "amzn1.echo-api.session.e4cfda26-302e-4fb1-b2e8-65ec7542ec50",
-                "application": {
-                    "applicationId": "amzn1.ask.skill.af36b546-6640-4e26-850d-5f5a7a71eb37"
-                },
-                "attributes": {},
-                "user": {
-                    "userId": "amzn1.ask.account.myuserid"
-                },
-                "affiliatedResources": []
-            },
-            "context": {
-                "Viewport": {
-                    "experiences": [
-                        {
-                            "arcMinuteWidth": 0,
-                            "arcMinuteHeight": 0,
-                            "canRotate": false,
-                            "canResize": false
-                        }
-                    ],
-                    "mode": "MOBILE",
-                    "shape": "RECTANGLE",
-                    "pixelWidth": 3200,
-                    "pixelHeight": 1440,
-                    "dpi": 0,
-                    "currentPixelWidth": 3200,
-                    "currentPixelHeight": 1440,
-                    "touch": [
-                        "SINGLE"
-                    ],
-                    "keyboard": [
-                        "DIRECTION"
-                    ]
-                },
-                "Extensions": {
-                    "available": {}
-                },
-                "Advertising": {
-                    "advertisingId": "00000000-0000-0000-0000-000000000000",
-                    "limitAdTracking": true
-                },
-                "System": {
-                    "application": {
-                        "applicationId": "amzn1.ask.skill.af36b546-6640-4e26-850d-5f5a7a71eb37"
-                    },
-                    "user": {
-                        "userId": "amzn1.ask.account.myuserid"
-                    },
-                    "device": {
-                        "deviceId": "amzn1.ask.device.mydeviceid",
-                        "supportedInterfaces": {
-                            "Geolocation": {}
-                        }
-                    },
-                    "apiEndpoint": "https://api.eu.amazonalexa.com",
-                    "apiAccessToken": "sometoken"
-                }
-            },
-            "request": {
-                "type": "IntentRequest",
-                "requestId": "amzn1.echo-api.request.b3372b52-7263-4081-99ce-7b99899f0b57",
-                "locale": "de-DE",
-                "timestamp": "2024-05-25T16:46:23Z",
-                "intent": {
-                    "name": "AskQuestionIntent",
-                    "confirmationStatus": "NONE",
-                    "slots": {
-                        "fullQuery": {
-                            "name": "query",
-                            "value": "Wie viel sind 15+15",
-                            "resolutions": {
-                                "resolutionsPerAuthority": [
-                                    {
-                                        "authority": "AlexaEntities",
-                                        "status": {
-                                            "code": "ER_SUCCESS_NO_MATCH"
-                                        }
-                                    }
-                                ]
-                            },
-                            "confirmationStatus": "NONE",
-                            "source": "USER"
-                        }
-                    }
-                }
-            }
-        }
+        trigger = TestIntentHelper.getAskQuestionIntent("Wie viel sind 15+15");
 
         response = await app.handle(trigger);
         console.log("Response: " + response.response.outputSpeech.ssml)
         expect(response.response.outputSpeech.ssml).to.not.equal("<speak>Tut mir Leid, ich konnte deine Eingabe nicht verstehen.</speak>");
         expect(response.response.outputSpeech.ssml).to.contain("30");
 
-        trigger = {
-            "version": "1.0",
-            "session": {
-                "new": false,
-                "sessionId": "amzn1.echo-api.session.e4cfda26-302e-4fb1-b2e8-65ec7542ec50",
-                "application": {
-                    "applicationId": "amzn1.ask.skill.af36b546-6640-4e26-850d-5f5a7a71eb37"
-                },
-                "attributes": {},
-                "user": {
-                    "userId": "amzn1.ask.account.myuserid"
-                },
-                "affiliatedResources": []
-            },
-            "context": {
-                "Viewport": {
-                    "experiences": [
-                        {
-                            "arcMinuteWidth": 0,
-                            "arcMinuteHeight": 0,
-                            "canRotate": false,
-                            "canResize": false
-                        }
-                    ],
-                    "mode": "MOBILE",
-                    "shape": "RECTANGLE",
-                    "pixelWidth": 3200,
-                    "pixelHeight": 1440,
-                    "dpi": 0,
-                    "currentPixelWidth": 3200,
-                    "currentPixelHeight": 1440,
-                    "touch": [
-                        "SINGLE"
-                    ],
-                    "keyboard": [
-                        "DIRECTION"
-                    ]
-                },
-                "Extensions": {
-                    "available": {}
-                },
-                "Advertising": {
-                    "advertisingId": "00000000-0000-0000-0000-000000000000",
-                    "limitAdTracking": true
-                },
-                "System": {
-                    "application": {
-                        "applicationId": "amzn1.ask.skill.af36b546-6640-4e26-850d-5f5a7a71eb37"
-                    },
-                    "user": {
-                        "userId": "amzn1.ask.account.myuserid"
-                    },
-                    "device": {
-                        "deviceId": "amzn1.ask.device.mydeviceid",
-                        "supportedInterfaces": {
-                            "Geolocation": {}
-                        }
-                    },
-                    "apiEndpoint": "https://api.eu.amazonalexa.com",
-                    "apiAccessToken": "sometoken"
-                }
-            },
-            "request": {
-                "type": "IntentRequest",
-                "requestId": "amzn1.echo-api.request.b3372b52-7263-4081-99ce-7b99899f0b57",
-                "locale": "de-DE",
-                "timestamp": "2024-05-25T16:46:23Z",
-                "intent": {
-                    "name": "AskQuestionIntent",
-                    "confirmationStatus": "NONE",
-                    "slots": {
-                        "fullQuery": {
-                            "name": "query",
-                            "value": "Wie viel sind 16+16",
-                            "resolutions": {
-                                "resolutionsPerAuthority": [
-                                    {
-                                        "authority": "AlexaEntities",
-                                        "status": {
-                                            "code": "ER_SUCCESS_NO_MATCH"
-                                        }
-                                    }
-                                ]
-                            },
-                            "confirmationStatus": "NONE",
-                            "source": "USER"
-                        }
-                    }
-                }
-            }
-        }
+        trigger = TestIntentHelper.getAskQuestionIntent("Wie viel sind 16+16");
 
         response = await app.handle(trigger);
         console.log("Response: " + response.response.outputSpeech.ssml)
         expect(response.response.outputSpeech.ssml).to.not.equal("<speak>Tut mir Leid, ich konnte deine Eingabe nicht verstehen.</speak>");
         expect(response.response.outputSpeech.ssml).to.contain("32");
+
+        const ddbConfig = {
+            region: "eu-west-1",
+            endpoint: "http://localhost:4566"
+        };
+        const dynamoDbClientWrapper = new DynamoDbClientWrapper(ddbConfig);
+        let userAccountMappingsManager = new UserAccountMappingsManager(dynamoDbClientWrapper);
+        let userDataManager = new UserDataManager(dynamoDbClientWrapper, userAccountMappingsManager);
+
+        let messageHistoryWrapper = await userDataManager.getMessageHistory("amzn1.ask.account.myuserid");
+        console.log("Message history: " + JSON.stringify(messageHistoryWrapper));
     });
 
+    it("verify AskQuestionIntentHandler returns date-time-tool response", async () => {
+        const date = new Date();
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1;
+        const monthName = date.toLocaleString('de', { month: 'long' });
+        const day = date.getDate();
+
+        const app = new AmaApp();
+        const trigger = TestIntentHelper.getAskQuestionIntent("Welches Datum haben wir heute?");
+        const response = await app.handle(trigger);
+        const speechResponse = response.response.outputSpeech.ssml;
+
+        expect(speechResponse).to.contain(day);
+        expect(speechResponse).to.satisfy((speech) => speech.includes(month) || speech.includes(monthName));
+        expect(speechResponse).to.contain(year);
+    });
+
+    it("verify AskQuestionIntentHandler returns simple search engine response", async () => {
+        const app = new AmaApp();
+        const trigger = TestIntentHelper.getAskQuestionIntent("Was sind die Schlagzeilen des Tages? Bitte mit details.");
+        const response = await app.handle(trigger);
+        const speechResponse = response.response.outputSpeech.ssml;
+        logger.info("Response: " + speechResponse);
+    });
 });
 

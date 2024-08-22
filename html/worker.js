@@ -10,19 +10,6 @@ export default {
         const { method } = request
         console.log(`Original: ${method} request to ${parsedUrl.hostname}${parsedUrl.pathname}`)
 
-        if ( method === "OPTIONS" ) {
-            console.log("Responding to CORS preflight request")
-            return new Response(null, {
-                status: 200,
-                headers: {
-                    'Access-Control-Allow-Origin': 'https://aws.pinguincloud.de',
-                    'Access-Control-Allow-Methods': 'PUT',
-                    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-                    'Access-Control-Max-Age': '86400',
-                },
-            });
-        }
-
         // handle requests to /production/accounts/{accountId}/apiKey
         if ( method === "PUT" && parsedUrl.pathname.startsWith("/production/accounts/") && parsedUrl.pathname.endsWith("/apiKey") ) {
             console.log("Handling updateApiKey request")

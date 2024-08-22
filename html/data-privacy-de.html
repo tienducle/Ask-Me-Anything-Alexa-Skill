@@ -16,7 +16,7 @@ Auf der Webseite https://link.pinguincloud.de/ama-de [1] werden Sie gebeten, Dat
 <h2>Gespeicherte Daten</h2>
 <h3>Nutzung ohne eigenen API-Schlüssel</h3>
 <b>id</b> - Vom ASK-SDK wird automatisch eine eindeutige Benutzer-ID generiert. Diese ist für jeden Skill des Benutzers unterschiedlich und wird nur als SHA-512 Hash gespeichert.<br>
-<b>messageHistory</b> - Bis zu 3 letzte Nachrichten, die der Benutzer an den Skill gesendet hat, werden gespeichert. Diese werden für die Kommunikation mit dem GPT Modell verwendet, damit der Benutzer Folgefragen stellen kann und das GPT Modell den Bezug zu den vorherigen Fragen nicht verliert.<br>
+<b>messageHistory</b> - Bis zu 5 letzte Nachrichten, die der Benutzer an den Skill gesendet hat, werden gespeichert. Diese werden für die Kommunikation mit dem GPT Modell verwendet, damit der Benutzer Folgefragen stellen kann und das GPT Modell den Bezug zu den vorherigen Fragen nicht verliert.<br>
 <b>usagesByMonth</b> - Liste mit zwölf Einträgen, die die Anzahl der Anfragen pro Monat speichert, um zu erkennen ob das Limit von 30 Anfragen pro Monat erreicht wurde. Der Zähler des kommenden Monats wird dabei immer genullt.<br>
 <h3>Nutzung mit einem eigenen API-Schlüssel</h3>
 <b>apiKey</b> - Der API-Schlüssel wird mit dem SHA-512 Hashwert der Benutzer ID und einem zusätzlichem Salt verschlüsselt gespeichert. Der Schlüssel wird nur im Arbeitsspeicher des AWS Lambda Backends entschlüsselt, um Anfragen an die OpenAI API zu senden.<br>

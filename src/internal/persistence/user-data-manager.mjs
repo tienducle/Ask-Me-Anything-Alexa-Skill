@@ -1,6 +1,7 @@
 import Environment from "../../environment.mjs";
 import {Logger} from "../logger.mjs";
 import {UserData} from "../model/user-data.mjs";
+import {ScopedUserDataManager} from "./scoped-user-data-manager.mjs";
 import crypto from "crypto";
 import {CryptoWrapper} from "../crypto/crypto-wrapper.mjs";
 
@@ -37,6 +38,7 @@ export class UserDataManager {
         this.accountMappingsManager = accountMappingsManager;
 
         // hashedAlexaUserId -> { timestamp: 12345, userData: <userData> }
+        /** type {Map<string, {timestamp: number, userData: UserData}>} */
         this.userDataCache = new Map();
 
         // alexaUserId -> { timestamp: 12345, hashedAlexaUserId: <hashedAlexaUserId> }
@@ -44,6 +46,17 @@ export class UserDataManager {
 
         // hashedAlexaUserId -> { timestamp: 12345, apiKey: <apiKey> }
         this.apiKeyCache = new Map();
+
+        this.scopedUserDataManagerCache = new Map();
+    }
+
+    getScopedUserDataManager(userId) {
+        if (this.scopedUserDataManagerCache.has(userId)) {
+            return this.scopedUserDataManagerCache.get(userId);
+        }
+        const scopedUserDataManager = new ScopedUserDataManager(this, userId);
+        this.scopedUserDataManagerCache.set(userId, scopedUserDataManager);
+        return scopedUserDataManager;
     }
 
     /**
@@ -156,6 +169,15 @@ export class UserDataManager {
     }
 
     /**
+     *
+     * @param alexaUserId {string} re
+     * @return {Promise<string>}
+     */
+    async getGptServiceId(alexaUserId) {
+        return (await this.#loadOrCreateUserData(alexaUserId)).getGptServiceId();
+    }
+
+    /**
      * Returns the API key of the user specified by the user id.
      * If no API key was set, returns undefined.
      *
@@ -174,7 +196,7 @@ export class UserDataManager {
             return undefined;
         }
 
-        apiKey = CryptoWrapper.decrypt(hashedAlexaUserId + Environment.encryptedApiKeySalt, apiKeyEncrypted);
+        apiKey = CryptoWrapper.decrypt(alexaUserId + hashedAlexaUserId + Environment.encryptedApiKeySalt, apiKeyEncrypted);
         this.putApiKeyToCache(hashedAlexaUserId, apiKey);
         logger.debug("Cached user API key")
         return apiKey;
@@ -183,8 +205,8 @@ export class UserDataManager {
     /**
      * Returns the message history of the user specified by the user id.
      *
-     * @param alexaUserId {string}
-     * @return {Promise<{assistant: string, user: string}[]>}
+     * @param alexaUserId
+     * @return {Promise<Message[]>}
      */
     async getMessageHistory(alexaUserId) {
         return (await this.#loadOrCreateUserData(alexaUserId)).getMessageHistory();
@@ -195,17 +217,24 @@ export class UserDataManager {
      * If more than 3 pairs are in the history, the oldest pair is removed.
      *
      * @param alexaUserId {string}
-     * @param userMessage {string}
-     * @param assistantMessage {string}
+     * @param message {Message}
      * @return {Promise<void>}
      */
-    async addMessagePairToHistory(alexaUserId, userMessage, assistantMessage) {
+    async addMessageToHistory(alexaUserId, message) {
         const userData = await this.#loadOrCreateUserData(alexaUserId);
         const messageHistory = userData.getMessageHistory();
-        messageHistory.push({user: userMessage, assistant: assistantMessage});
-        // only keep max 3 pairs
-        if (messageHistory.length > 3) {
+        messageHistory.push(message);
+
+        if (messageHistory.length > userData.getMaxMessageHistory()) {
             messageHistory.shift();
+
+            // workaround for OpenAI
+            // when a function call was used, the messages sequence is user, assistant, tool, assistant
+            // when the user+assistant message pairs were deleted, the tool message will cause an error
+            // because a tool message must be preceded by the assistant message
+            if (messageHistory[0].getRole() === 'tool') {
+                messageHistory.shift();
+            }
         }
     }
 
@@ -342,11 +371,7 @@ export class UserDataManager {
         // if user does not exist, create a new entry
         logger.debug('User not found in database, creating new entry')
         userData = new UserData({
-            hashedAlexaUserId: hashedAlexaUserId,
-            registered: false,
-            apiKeyEncrypted: "",
-            username: "",
-            messageHistory: []
+            hashedAlexaUserId: hashedAlexaUserId
         });
         await this.dynamoDbClientWrapper.putItem(DYNAMO_DB_TABLE_NAME, this.#serializeUserDataForDb(userData));
         this.putUserDataToCache(hashedAlexaUserId, userData);
@@ -357,7 +382,7 @@ export class UserDataManager {
      * Updates the user data in the database with the current message history and current usage counts.
      *
      * @param alexaUserId {string}
-     * @param messageHistory {Array<{assistant: string, user: string}>}
+     * @param messageHistory {Message[]}
      * @param usagesByMonth {Array<number>}
      * @return {Promise<*>}
      */
@@ -369,7 +394,8 @@ export class UserDataManager {
             "#lastModified": "lastModified"
         };
         const expressionAttributeValues = {
-            ":messageHistory": messageHistory,
+            // ":messageHistory": messageHistory.map((message) => message.serialize()),
+            ":messageHistory": messageHistory.map((message) => JSON.stringify(message)),
             ":usagesByMonth": usagesByMonth,
             ":lastModified": Date.now()
         };
@@ -387,7 +413,7 @@ export class UserDataManager {
      */
     async updateApiKey(alexaUserId, apiKey) {
         const hashedAlexaUserId = this.getHashedAlexaUserId(alexaUserId);
-        const apiKeyEncrypted = apiKey ? CryptoWrapper.encrypt(hashedAlexaUserId + Environment.encryptedApiKeySalt, apiKey) : "";
+        const apiKeyEncrypted = apiKey ? CryptoWrapper.encrypt(alexaUserId + hashedAlexaUserId + Environment.encryptedApiKeySalt, apiKey) : "";
 
         const updateExpression = "set #apiKeyEncrypted = :apiKeyEncrypted, #lastModified = :lastModified";
         const expressionAttributeNames = {
@@ -450,7 +476,7 @@ export class UserDataManager {
     /**
      * Serialize user data for DynamoDB.
      * @param userData {UserData}
-     * @return {{[p: number]: *, apiKeyEncrypted: (string|*), messageHistory: ([]|*), registered: (Map<string, PluginDefinition>|boolean|*), lastModified, username}}
+     * @return {{[p: number]: *, apiKeyEncrypted: (string|*), messageHistoryHelper: (string), registered: (Map<string, PluginDefinition>|boolean|*), lastModified, username}}
      */
     #serializeUserDataForDb(userData) {
         return {
@@ -459,7 +485,9 @@ export class UserDataManager {
             registered: userData.isRegistered(),
             apiKeyEncrypted: userData.getApiKeyEncrypted(),
             username: userData.getUsername(),
-            messageHistory: userData.getMessageHistory(),
+            maxMessageHistory: userData.getMaxMessageHistory(),
+            messageHistory: userData.getMessageHistory().map((message) => JSON.stringify(message)),
+            // messageHistory: userData.getMessageHistory().map((message) => message.serialize()),
         }
     }
 }

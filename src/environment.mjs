@@ -15,9 +15,16 @@ export class Environment {
         this._encryptedUserIdSalt = process.env.ENCRYPTED_USER_ID_SALT;
         this._encryptedApiKeySalt = process.env.ENCRYPTED_API_KEY_SALT;
 
+        this._defaultGptServiceId = process.env.DEFAULT_GPT_SERVICE_ID || 'open-ai';
+
         this._openAiApiKey = process.env.OPEN_AI_API_KEY;
         this._openAiModel = process.env.OPEN_AI_MODEL || 'gpt-4o';
-        this._unregisteredUsersUsageQuotaPerMonth = process.env.UNREGISTERED_USERS_USAGE_QUOTA_PER_MONTH || 50;
+
+        this._googlePseSearchEngineId = process.env.GOOGLE_PSE_SEARCH_ENGINE_ID;
+        this._googlePseApiKey = process.env.GOOGLE_PSE_API_KEY;
+        this._customSearchEngineBlocklist = process.env.CUSTOM_SEARCH_ENGINE_BLOCKLIST?.split(',') || [];
+
+        this._unregisteredUsersUsageQuotaPerMonth = process.env.UNREGISTERED_USERS_USAGE_QUOTA_PER_MONTH || 30;
     }
 
     get dynamoDbRegion() {
@@ -60,12 +67,32 @@ export class Environment {
         return this._encryptedApiKeySalt;
     }
 
+    get defaultGptServiceId() {
+        return this._defaultGptServiceId;
+    }
+
     get openAiApiKey() {
         return this._openAiApiKey;
     }
 
     get openAiModel() {
         return this._openAiModel;
+    }
+
+    get googlePseSearchEngineId() {
+        return this._googlePseSearchEngineId;
+    }
+
+    get googlePseApiKey() {
+        return this._googlePseApiKey;
+    }
+
+    /**
+     *
+     * @return {string[]}
+     */
+    get customSearchEngineBlocklist() {
+        return this._customSearchEngineBlocklist;
     }
 
     get unregisteredUsersUsageQuotaPerMonth() {

@@ -4,6 +4,7 @@ import Environment from "../../src/environment.mjs";
 import {DynamoDbClientWrapper} from "../../src/internal/client/dynamo-db-client-wrapper.mjs";
 import {UserAccountMappingsManager} from "../../src/internal/persistence/user-account-mappings-manager.mjs";
 import {UserDataManager} from "../../src/internal/persistence/user-data-manager.mjs";
+import {Common} from "./common.mjs";
 
 describe("AmaBackendApp tests", () => {
 
@@ -19,25 +20,10 @@ describe("AmaBackendApp tests", () => {
     /** @type {UserAccountMappingsManager} */
     let userAccountMappingsManager;
 
-    const ddbConfig = {
-        region: "eu-west-1",
-        endpoint: "http://localhost:4566"
-    };
-
     before( async function () {
-        const tableName_userData = Environment.dynamoDbUserDataTableName;
-        const tableName_accountMappings = Environment.dynamoDbAccountMappingsTableName;
+        await Common.setup();
 
-        const keySchemaList = [];
-        keySchemaList.push({AttributeName: Environment.dynamoDbUserDataTablePartitionKeyName, KeyType: "HASH"});
-
-        const attributeDefinitionList = [];
-        attributeDefinitionList.push({AttributeName: Environment.dynamoDbUserDataTablePartitionKeyName, AttributeType: "S"});
-
-        const dynamoDbClientWrapper = new DynamoDbClientWrapper(ddbConfig);
-
-        await dynamoDbClientWrapper.createTable(tableName_userData, keySchemaList, attributeDefinitionList);
-        await dynamoDbClientWrapper.createTable(tableName_accountMappings, keySchemaList, attributeDefinitionList);
+        const dynamoDbClientWrapper = new DynamoDbClientWrapper(Common.ddbConfig);
 
         userAccountMappingsManager = new UserAccountMappingsManager(dynamoDbClientWrapper);
         userDataManager = new UserDataManager(dynamoDbClientWrapper, userAccountMappingsManager);

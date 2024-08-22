@@ -1,20 +1,14 @@
-import {AmaApp} from "../../src/ama-app.mjs";
-import {expect} from "chai";
-import {Common} from "./common.mjs";
+export class TestIntentHelper {
 
-describe("AmaApp tests", () => {
-
-    before( async function () {
-        await Common.setup();
-    } );
-
-    it("verify default trigger returns welcome message", async () => {
-
-        const app = new AmaApp();
-        const trigger = {
+    /**
+     *
+     * @param question {string}
+     */
+    static getAskQuestionIntent( question ) {
+        return {
             "version": "1.0",
             "session": {
-                "new": true,
+                "new": false,
                 "sessionId": "amzn1.echo-api.session.e4cfda26-302e-4fb1-b2e8-65ec7542ec50",
                 "application": {
                     "applicationId": "amzn1.ask.skill.af36b546-6640-4e26-850d-5f5a7a71eb37"
@@ -74,17 +68,33 @@ describe("AmaApp tests", () => {
                 }
             },
             "request": {
-                "type": "LaunchRequest",
-                "requestId": "amzn1.echo-api.request.acf3845e-c664-4564-a88b-3471f139c8d2",
+                "type": "IntentRequest",
+                "requestId": "amzn1.echo-api.request.b3372b52-7263-4081-99ce-7b99899f0b57",
                 "locale": "de-DE",
-                "timestamp": "2024-05-25T16:46:18Z",
-                "shouldLinkResultBeReturned": false
+                "timestamp": "2024-05-25T16:46:23Z",
+                "intent": {
+                    "name": "AskQuestionIntent",
+                    "confirmationStatus": "NONE",
+                    "slots": {
+                        "fullQuery": {
+                            "name": "query",
+                            "value": question,
+                            "resolutions": {
+                                "resolutionsPerAuthority": [
+                                    {
+                                        "authority": "AlexaEntities",
+                                        "status": {
+                                            "code": "ER_SUCCESS_NO_MATCH"
+                                        }
+                                    }
+                                ]
+                            },
+                            "confirmationStatus": "NONE",
+                            "source": "USER"
+                        }
+                    }
+                }
             }
         }
-
-        const response = await app.handle(trigger);
-        expect(response.response.outputSpeech.ssml).to.equal("<speak>Willkommen beim Online Lexikon.</speak>");
-    });
-
-});
-
+    }
+}

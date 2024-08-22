@@ -1,13 +1,22 @@
 import Alexa from "ask-sdk-core";
 import LocaleService from "../internal/locale-service.mjs";
 import {Logger} from "../internal/logger.mjs";
-import {OpenAiService} from "../gpt/open-ai-service.mjs";
+import {OpenAiService} from "../internal/gpt/openai/open-ai-service.mjs";
 import {UserDataManager} from "../internal/persistence/user-data-manager.mjs";
+import Environment from "../environment.mjs";
 
 const logger = new Logger('AskQuestionIntentHandler', process.env.LOG_LEVEL_ASK_QUESTION_INTENT_HANDLER);
 
-const SERVICE = process.env.GPT_SERVICE || 'OpenAI';
-const SERVICE_INSTANCE = {};
+const SERVICES = {
+    OPEN_AI: {
+        id: 'open-ai',
+        displayName: "OpenAI",
+        instance: new OpenAiService(),
+        invoke: async function (scopedUserDataManager, query, locale) {
+            return await this.instance.getAnswer(scopedUserDataManager, query, locale);
+        }
+    }
+}
 
 export class AskQuestionIntentHandler {
 
@@ -49,10 +58,6 @@ export class AskQuestionIntentHandler {
             logger.debug(`Handler input: ${JSON.stringify(handlerInput)}`);
         }
 
-        if (!SERVICE_INSTANCE.SERVICE) {
-            SERVICE_INSTANCE.SERVICE = this.initializeService();
-        }
-
         const alexaUserId = Alexa.getUserId(handlerInput.requestEnvelope)
         const locale = handlerInput.requestEnvelope._internal.locale;
 
@@ -70,15 +75,15 @@ export class AskQuestionIntentHandler {
             }
         }
 
+        const gptServiceId = await this.userDataManager.getGptServiceId(alexaUserId) || Environment.defaultGptServiceId;
+        const service = Object.values(SERVICES).find(service => service.id === gptServiceId);
         const query = handlerInput.requestEnvelope.request.intent.slots.query?.value || handlerInput.requestEnvelope.request.intent.slots.fullQuery?.value;
-        const answer = await SERVICE_INSTANCE.SERVICE.getAnswer(
-            userApiKey,
-            await this.userDataManager.getMessageHistory(alexaUserId),
-            query, locale
-        );
+        const answer = await service.invoke( this.userDataManager.getScopedUserDataManager(alexaUserId), query, locale );
 
-        await this.userDataManager.addMessagePairToHistory(alexaUserId, query, answer);
-        await this.userDataManager.incrementUsageCount(alexaUserId, userApiKey);
+        if (!userApiKey)
+        {
+            await this.userDataManager.incrementUsageCount(alexaUserId, userApiKey);
+        }
 
         const answerPrefixTexts = LocaleService.getLocalizedTexts(locale, "handler.askQuestion.answerPrefixText");
         const repromptTexts = LocaleService.getLocalizedTexts(locale, "handler.askQuestion.repromptText");

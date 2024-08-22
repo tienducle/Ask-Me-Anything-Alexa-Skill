@@ -75,14 +75,16 @@ export class Accounts {
         // decrypt alexaUserId with username + password + salt
         const alexaUserIdEncrypted = userAccountMapping.getAlexaUserIdEncrypted();
         const alexaUserId = CryptoWrapper.decrypt(usernameFromHeader + passwordFromHeader + Environment.encryptedUserIdSalt, alexaUserIdEncrypted);
-        logger.debug("Access granted to alexaUserId:" + alexaUserId);
+        logger.debug("Access granted");
 
         // now we can access the corresponding user in the userdata table
         logger.debug("Store encrypted api key in user data")
         const apiKey = this.getApiKeyFromPayload(lambdaTriggerPayload.body);
         const result = await this.userDataManager.updateApiKey(alexaUserId, apiKey);
 
-        logger.debug("Result: " + JSON.stringify(result));
+        if (logger.checkLogLevel(Logger.LEVEL_DEBUG)) {
+            logger.debug("Result: " + JSON.stringify(result));
+        }
         const resultCode = result?.$metadata?.httpStatusCode;
         return {
             statusCode: (!resultCode)
