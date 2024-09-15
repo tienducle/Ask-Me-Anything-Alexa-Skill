@@ -432,6 +432,7 @@ export class UserDataManager {
     async purgeInactiveUsers() {
         const inactiveUsers = await this.getInactiveUsers();
         if (inactiveUsers.length === 0) {
+            logger.info("No inactive users found");
             return;
         }
         logger.info(`Purging ${inactiveUsers.length} inactive users`);

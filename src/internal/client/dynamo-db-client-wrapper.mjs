@@ -126,7 +126,7 @@ export class DynamoDbClientWrapper {
             return data.LastEvaluatedKey ? [...data.Items, ...await this.scanAll(tableName, data.LastEvaluatedKey, filterExpression, expressionAttributeNames, expressionAttributeValues)] : data.Items;
 
         } catch (error) {
-            console.log("An error occurred while executing SCAN command:", error);
+            logger.error("An error occurred while executing SCAN command:", error);
         }
 
         return [];

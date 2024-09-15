@@ -187,6 +187,24 @@ Resources:
     Properties:
       LogGroupName: !Sub "/aws/lambda/${AmaBackend}"
       RetentionInDays: 1
+  AmaBackendPurgeInactiveUsersRule:
+      Type: AWS::Events::Rule
+      Properties:
+        ScheduleExpression: "rate(1 day)"
+        State: ENABLED
+        Targets:
+          - Arn: !GetAtt AmaBackend.Arn
+            Id: "PurgeInactiveUsers"
+            Input: '{"command": "PurgeInactiveUsers"}'
+  AmaBackendPurgeInactiveUsersPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt AmaBackend.Arn
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn: !GetAtt AmaBackendPurgeInactiveUsersRule.Arn
+
+
 
 Outputs:
   # Skill

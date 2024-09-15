@@ -55,6 +55,7 @@ export class AmaBackendApp {
 
         // CloudWatch trigger
         if ( lambdaTriggerPayload.command === "PurgeInactiveUsers" ) {
+            logger.info(`Purging inactive users`);
             return this.userDataManager.purgeInactiveUsers();
         }
 
