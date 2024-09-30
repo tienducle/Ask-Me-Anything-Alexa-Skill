@@ -2,15 +2,24 @@ import {Logger} from "../logger.mjs";
 
 const logger = new Logger('ScopedUserDataManager', process.env.LOG_LEVEL_USER_DATA_MANAGER);
 
+/**
+ * The scoped user data manager is a wrapper around the user data manager
+ * that is scoped to a specific user, allowing access and modification of only that user's data.
+ */
 export class ScopedUserDataManager {
 
+    /**
+     *
+     * @param userDataManager {UserDataManager}
+     * @param userId {string}
+     */
     constructor( userDataManager, userId ) {
         this.userDataManager = userDataManager;
         this.userId = userId;
     }
 
     /**
-     * Returns the API key of the user specified by the user id.
+     * Returns the API key of the user.
      * If no API key was set, returns undefined.
      *
      * @return {Promise<string|undefined>}
@@ -20,7 +29,7 @@ export class ScopedUserDataManager {
     }
 
     /**
-     * Returns the message history of the user specified by the user id.
+     * Returns the message history of the user.
      *
      * @return {Promise<Message[]>}
      */
@@ -29,7 +38,7 @@ export class ScopedUserDataManager {
     }
 
     /**
-     * Add a message pair to the message history of the user specified by the user id.
+     * Add a message pair to the message history of the user.
      * If more than 3 pairs are in the history, the oldest pair is removed.
      *
      * @param message {Message}

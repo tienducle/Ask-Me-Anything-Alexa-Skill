@@ -51,7 +51,7 @@ export class UserAccountMappingsManager {
         while (validUsername === false) {
             // random number 4 digits only
             username = usernameIdPart + "#" + Math.floor(1000 + Math.random() * 9000);
-            usernameHash = crypto.createHash('sha512').update(username).digest('hex');
+            usernameHash = this.getHashedUsername(username);
             const usernameMapping = await this.dynamoDbClientWrapper.getItem(DYNAMO_DB_TABLE_NAME, DYNAMO_DB_PARTITION_KEY_NAME, usernameHash);
             if (!usernameMapping.Item) {
                 validUsername = true;

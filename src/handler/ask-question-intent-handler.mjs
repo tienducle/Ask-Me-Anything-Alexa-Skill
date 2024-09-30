@@ -7,6 +7,10 @@ import Environment from "../environment.mjs";
 
 const logger = new Logger('AskQuestionIntentHandler', process.env.LOG_LEVEL_ASK_QUESTION_INTENT_HANDLER);
 
+/*
+ * Available services to use for answering questions.
+ * Currently only OpenAI is supported.
+ */
 const SERVICES = {
     OPEN_AI: {
         id: 'open-ai',
@@ -21,23 +25,14 @@ const SERVICES = {
 export class AskQuestionIntentHandler {
 
     /**
-     *
      * @param userDataManager {UserDataManager}
      */
     constructor(userDataManager) {
         this.userDataManager = userDataManager;
     }
 
-    initializeService() {
-        logger.debug(`Initializing service ${SERVICE}`);
-        if (SERVICE === 'OpenAI') {
-            return new OpenAiService();
-        } else {
-            return new OpenAiService();
-        }
-    }
-
     /**
+     * SDK-required function to check if the handler can handle the request.
      *
      * @param handlerInput
      * @return {boolean}
@@ -48,6 +43,9 @@ export class AskQuestionIntentHandler {
     }
 
     /**
+     * SDK-required function to handle the request.
+     *
+     * The function forwards the user query to the configured GPT service and returns the answer.
      *
      * @param handlerInput
      * @return {Response}

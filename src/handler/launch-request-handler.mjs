@@ -16,6 +16,7 @@ export class LaunchRequestHandler {
     }
 
     /**
+     * SDK-required function to check if the handler can handle the request.
      *
      * @param handlerInput
      * @return {boolean}
@@ -25,6 +26,7 @@ export class LaunchRequestHandler {
     }
 
     /**
+     * SDK-required function to handle the request.
      *
      * @param handlerInput
      * @return {Response}

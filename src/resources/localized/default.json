@@ -3,7 +3,7 @@
   "gpt.prefix": "Answer this question: ",
   "handler.launchRequest.welcomeText.speechText": "Welcome to the Online Lexicon.",
   "handler.launchRequest.welcomeText.cardTitle": "Welcome to the Online Lexicon.",
-  "handler.launchRequest.welcomeText.cardContent": "You can ask me anything.",
+  "handler.launchRequest.welcomeText.cardContent": "You can ask me anything.\nLatest feature: Integration of Web-Search. GPT-4o now has the ability to perform a web search when being asked for current information. Furthermore, this can also be explicitly requested, e.g. say 'Search the web for ...'.",
   "handler.launchRequest.error.noUserId.speechText": "No userId was found in Alexa request.",
   "handler.launchRequest.error.noUserId.cardTitle": "Error: ",
   "handler.launchRequest.error.couldNotCreateUserAccount.speechText": "User account data could not be created. This is required to store up to 3 messages for your GPT context.",

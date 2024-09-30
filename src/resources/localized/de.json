@@ -3,7 +3,7 @@
   "gpt.prefix": "Beantworte die folgende Frage: ",
   "handler.launchRequest.welcomeText.speechText": "Willkommen beim Online Lexikon.",
   "handler.launchRequest.welcomeText.cardTitle": "Willkommen beim Online Lexikon.",
-  "handler.launchRequest.welcomeText.cardContent": "Du kannst mich alles fragen.",
+  "handler.launchRequest.welcomeText.cardContent": "Du kannst mich alles fragen.\nNeueste Funktion: Integration von Web-Suche. GPT-4o hat nun die Möglichkeit, eine Web-Suche durchzuführen, wenn man bspw. nach aktuellen Informationen fragt. Des Weiteren kann dies auch explizit angefragt werden, z.B. mit 'Suche im Web nach ...'.",
   "handler.launchRequest.error.noUserId.speechText": "Keine userId wurde in der Alexa-Anfrage gefunden.",
   "handler.launchRequest.error.noUserId.cardTitle": "Error: ",
   "handler.launchRequest.error.couldNotCreateUserAccount.speechText": "Benutzerdaten konnten nicht erstellt werden. Dies ist erforderlich, um bis zu 3 Nachrichten für Deinen GPT-Kontext zu speichern.",

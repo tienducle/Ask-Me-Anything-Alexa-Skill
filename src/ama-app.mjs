@@ -4,7 +4,6 @@ import {LaunchRequestHandler} from './handler/launch-request-handler.mjs';
 import {CancelStopIntentHandler} from './handler/cancel-stop-intent-handler.mjs';
 import {HelpIntentHandler} from './handler/help-intent-handler.mjs';
 import {SessionEndedRequestHandler} from './handler/session-ended-request-handler.mjs';
-import {FallbackIntentHandler} from "./handler/fallback-intent-handler.mjs";
 import {CustomErrorHandler} from './handler/custom-error-handler.mjs';
 
 import {AskQuestionIntentHandler} from './handler/ask-question-intent-handler.mjs';
@@ -47,8 +46,7 @@ export class AmaApp {
                 new RegistrationIntentHandler(this.userDataManager, this.accountMappingsManager),
                 new SessionEndedRequestHandler(this.userDataManager),
                 new CancelStopIntentHandler(this.userDataManager),
-                HelpIntentHandler,
-                FallbackIntentHandler
+                HelpIntentHandler
             )
             .addErrorHandlers(CustomErrorHandler)
             .create();

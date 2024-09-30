@@ -38,22 +38,33 @@ export class UserDataManager {
         this.accountMappingsManager = accountMappingsManager;
 
         // hashedAlexaUserId -> { timestamp: 12345, userData: <userData> }
-        /** type {Map<string, {timestamp: number, userData: UserData}>} */
+        /** @type {Map<string, {timestamp: number, userData: UserData}>} */
         this.userDataCache = new Map();
 
         // alexaUserId -> { timestamp: 12345, hashedAlexaUserId: <hashedAlexaUserId> }
+        /** @type {Map<string, {timestamp: number, hashedAlexaUserId: string}>} */
         this.hashedAlexaUserIdCache = new Map();
 
         // hashedAlexaUserId -> { timestamp: 12345, apiKey: <apiKey> }
+        /** @type {Map<string, {timestamp: number, apiKey: string}>} */
         this.apiKeyCache = new Map();
 
+        // userId -> ScopedUserDataManager
+        /** @type {Map<string, ScopedUserDataManager>} */
         this.scopedUserDataManagerCache = new Map();
     }
 
+    /**
+     * Returns a {@link ScopedUserDataManager} for the given user id.
+     *
+     * @param userId
+     * @returns {ScopedUserDataManager}
+     */
     getScopedUserDataManager(userId) {
         if (this.scopedUserDataManagerCache.has(userId)) {
             return this.scopedUserDataManagerCache.get(userId);
         }
+
         const scopedUserDataManager = new ScopedUserDataManager(this, userId);
         this.scopedUserDataManagerCache.set(userId, scopedUserDataManager);
         return scopedUserDataManager;
@@ -70,6 +81,7 @@ export class UserDataManager {
 
     /**
      * Create an entry in the account mappings table for the given user id.
+     *
      * @param alexaUserId
      * @return {Promise<boolean>} true if entry was created successfully, false otherwise
      */
@@ -238,6 +250,13 @@ export class UserDataManager {
         }
     }
 
+    /**
+     * Updates user data with the current message history and usage counts and ends the session,
+     * removing the user data from all caches.
+     *
+     * @param alexaUserId
+     * @returns {Promise<void>}
+     */
     async endSession(alexaUserId) {
         const userData = this.userDataCache.get(this.getHashedAlexaUserId(alexaUserId))?.userData;
         if (!userData) {
@@ -453,12 +472,17 @@ export class UserDataManager {
      * @returns {Promise<UserData[]>}
      */
     async getInactiveUsers() {
+
+        const now = Date.now();
+        const inactiveSinceTimestamp = now - MILLIS_UNTIL_INACTIVE;
+        logger.info(`Retrieving inactive users with lastModified < ${inactiveSinceTimestamp} (${new Date(inactiveSinceTimestamp)})`);
+
         const filterExpression = "#lastModified < :timestamp";
         const expressionAttributeNames = {
             "#lastModified": "lastModified"
         };
         const expressionAttributeValues = {
-            ":timestamp": Date.now() - MILLIS_UNTIL_INACTIVE
+            ":timestamp": inactiveSinceTimestamp
         };
 
         const result = await this.dynamoDbClientWrapper.scanAll(DYNAMO_DB_TABLE_NAME, filterExpression, expressionAttributeNames, expressionAttributeValues);

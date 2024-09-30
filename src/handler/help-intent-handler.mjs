@@ -7,6 +7,7 @@ const logger = new Logger('HelpIntentHandler', process.env.LOG_LEVEL_HELP_INTENT
 export const HelpIntentHandler = {
 
     /**
+     * SDK-required function to check if the handler can handle the request.
      *
      * @param handlerInput
      * @return {boolean}
@@ -17,6 +18,7 @@ export const HelpIntentHandler = {
     },
 
     /**
+     * SDK-required function to handle the request.
      *
      * @param handlerInput
      * @return {Response}

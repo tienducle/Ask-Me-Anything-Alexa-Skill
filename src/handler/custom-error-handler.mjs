@@ -18,6 +18,7 @@ export const CustomErrorHandler = {
     },
 
     /**
+     * SDK-required function to handle the request.
      *
      * @param handlerInput
      * @param error
