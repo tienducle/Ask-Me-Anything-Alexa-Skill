@@ -29,6 +29,15 @@ export class ScopedUserDataManager {
     }
 
     /**
+     * Returns the configured gpt model of the user.
+     *
+     * @return {Promise<string>}
+     */
+    async getModel() {
+        return this.userDataManager.getModel(this.userId);
+    }
+
+    /**
      * Returns the message history of the user.
      *
      * @return {Promise<Message[]>}

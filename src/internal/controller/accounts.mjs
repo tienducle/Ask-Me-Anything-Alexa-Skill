@@ -79,8 +79,18 @@ export class Accounts {
 
         // now we can access the corresponding user in the userdata table
         logger.debug("Store encrypted api key in user data")
-        const apiKey = this.getApiKeyFromPayload(lambdaTriggerPayload.body);
-        const result = await this.userDataManager.updateApiKey(alexaUserId, apiKey);
+        const payloadObj = this.parseBodyPayload(lambdaTriggerPayload.body);
+        if ( !payloadObj ) {
+            return Errors.BAD_REQUEST();
+        }
+
+        const apiKey = payloadObj.apiKey;
+        const model =  payloadObj.model;
+        if ( !model || model.length === 0 ) {
+            return Errors.BAD_REQUEST();
+        }
+
+        const result = await this.userDataManager.updateUserSettings(alexaUserId, apiKey, model);
 
         if (logger.checkLogLevel(Logger.LEVEL_DEBUG)) {
             logger.debug("Result: " + JSON.stringify(result));
@@ -96,22 +106,22 @@ export class Accounts {
     }
 
     /**
-     * Extracts the apiKey from the payload.
-     * Returns null if no apiKey is found
+     * Parses the body payload into an object.
+     * Returns undefined if no payload is found.
+     *
      * @param httpBody
-     * @return {string|undefined}
+     * @return {undefined|*}
      */
-    getApiKeyFromPayload(httpBody) {
+    parseBodyPayload(httpBody) {
         if (!httpBody) {
-            return undefined;
+            return;
         }
 
-        let payload;
         try {
-            payload = JSON.parse(httpBody);
+            return JSON.parse(httpBody);
         } catch (error) {
             logger.error("Error while parsing JSON body: " + error);
         }
-        return payload?.apiKey;
     }
+
 }

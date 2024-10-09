@@ -1,4 +1,5 @@
 import Alexa from "ask-sdk-core";
+import Environment from "../environment.mjs";
 import LocaleService from "../internal/locale-service.mjs";
 import {Logger} from "../internal/logger.mjs";
 import {UserDataManager} from "../internal/persistence/user-data-manager.mjs";
@@ -50,21 +51,21 @@ export class LaunchRequestHandler {
             return this.respondWithCouldNotCreateUserAccountError(handlerInput);
         }
 
-        return this.respond(handlerInput, LocaleService.getLocalizedTexts(locale, "handler.launchRequest.welcomeText"));
-
+        const model = await this.userDataManager.getModel(alexaUserId);
+        return this.respond(handlerInput, LocaleService.getLocalizedTexts(locale, "handler.launchRequest.welcomeText"), model);
     }
 
     respondWithCouldNotCreateUserAccountError(handlerInput) {
         return this.respond(handlerInput, LocaleService.getLocalizedTexts(handlerInput.requestEnvelope._internal.locale, "handler.launchRequest.error.couldNotCreateUserAccount"));
     }
 
-    respond(handlerInput, texts) {
+    respond(handlerInput, texts, model) {
         logger.debug(`Responding with ${JSON.stringify(texts)}`);
 
         return handlerInput.responseBuilder
             .speak(texts.speechText)
             .reprompt(texts.speechText)
-            .withSimpleCard(texts.cardTitle, texts.cardContent)
+            .withSimpleCard(texts.cardTitle, `Model: ${model || Environment.openAiModel}\n${texts.cardContent}`)
             .getResponse();
     }
 }

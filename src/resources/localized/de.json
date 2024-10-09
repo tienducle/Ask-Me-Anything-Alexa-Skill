@@ -12,7 +12,7 @@
   "handler.launchRequest.error.couldNotCreateUserAccountMapping.cardTitle": "Fehler:",
   "handler.launchRequest.error.couldNotFinalizeUserRegistration.speechText": "Registrierung konnte nicht abgeschlossen werden. Dies ist erforderlich, um Deinen eigenen API-Schlüssel einzurichten. Bitte versuche es erneut oder kontaktiere den Entwickler.",
   "handler.launchRequest.error.couldNotFinalizeUserRegistration.cardTitle": "Fehler:",
-  "handler.help.text.speechText": "Du kannst mir einfach Fragen stellen. Ich verstehe auch Folgefragen. Wenn du deinen eigenen OpenAI API Key benutzen möchtest, sage 'Registrieren'. Möchtest du probieren eine beliebige Frage zu stellen?",
+  "handler.help.text.speechText": "Du kannst mir einfach Fragen stellen. Ich verstehe auch Folgefragen. Wenn du deinen eigenen OpenAI API Key benutzen und/oder das GPT-Modell ändern möchtest, sage 'Registrieren'. Möchtest du nun probieren eine beliebige Frage zu stellen?",
   "handler.help.text.cardTitle": "Hilfe",
   "handler.help.repromptText.speechText": "Was möchtest du fragen?",
   "handler.registration.successInfo.speechText": "Du kannst Deinen eigenen API-Schlüssel unter https://link.pinguincloud.de/ama-de einrichten. Verwende die folgenden Anmeldedaten. Der Skill wird nun beendet, um deine aktuelle Session zu invalidieren.",

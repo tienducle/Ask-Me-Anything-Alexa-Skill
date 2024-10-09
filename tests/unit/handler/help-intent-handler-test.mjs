@@ -84,7 +84,7 @@ describe("HelpIntentHandler tests", () => {
         }
 
         const response = await app.handle(trigger);
-        expect(response.response.outputSpeech.ssml).to.equal("<speak>Du kannst mir einfach Fragen stellen. Ich verstehe auch Folgefragen. Wenn du deinen eigenen OpenAI API Key benutzen möchtest, sage 'Registrieren'. Möchtest du probieren eine beliebige Frage zu stellen?</speak>");
+        expect(response.response.outputSpeech.ssml).to.equal("<speak>Du kannst mir einfach Fragen stellen. Ich verstehe auch Folgefragen. Wenn du deinen eigenen OpenAI API Key benutzen und/oder das GPT-Modell ändern möchtest, sage 'Registrieren'. Möchtest du nun probieren eine beliebige Frage zu stellen?</speak>");
     });
 
 });

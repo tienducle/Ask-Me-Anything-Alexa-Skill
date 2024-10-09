@@ -14,6 +14,7 @@ describe("AmaBackendApp tests", () => {
     let generatedUserPassword;
     let userData;
     const apiKey = "some-api-key-to-set-for-test";
+    const model = "gpt-4o";
 
     /** @type {UserDataManager} */
     let userDataManager;
@@ -45,7 +46,7 @@ describe("AmaBackendApp tests", () => {
     } );
 
     it("verify that request with non-existing user is rejected with 403", async () => {
-        const trigger = getTriggerEventPayload("non-existing-user", "some-password", apiKey);
+        const trigger = getTriggerEventPayload("non-existing-user", "some-password", apiKey, model);
         const app = new AmaBackendApp();
 
         const response = await app.handle(trigger);
@@ -53,15 +54,23 @@ describe("AmaBackendApp tests", () => {
     });
 
     it("verify that request with existing user but wrong password is rejected with 403", async () => {
-        const trigger = getTriggerEventPayload(generatedUsername, generatedUserPassword + "randomstring", apiKey);
+        const trigger = getTriggerEventPayload(generatedUsername, generatedUserPassword + "randomstring", apiKey, model);
         const app = new AmaBackendApp();
 
         const response = await app.handle(trigger);
         expect(response.statusCode).to.equal(403);
     });
 
+    it("verify that request with correct credentials but missing model is rejected with 400", async () => {
+        const trigger = getTriggerEventPayload(generatedUsername, generatedUserPassword, apiKey, "");
+        const app = new AmaBackendApp();
+
+        const response = await app.handle(trigger);
+        expect(response.statusCode).to.equal(400);
+    });
+
     it("verify that request with correct credentials successfully sets the api key", async () => {
-        let trigger = getTriggerEventPayload(generatedUsername, generatedUserPassword, apiKey);
+        let trigger = getTriggerEventPayload(generatedUsername, generatedUserPassword, apiKey, model);
         const app = new AmaBackendApp();
 
         let response = await app.handle(trigger);
@@ -76,7 +85,7 @@ describe("AmaBackendApp tests", () => {
 
         // request to delete api key
         await userDataManager.endSession(alexaUserId);
-        trigger = getTriggerEventPayload(generatedUsername, generatedUserPassword, "");
+        trigger = getTriggerEventPayload(generatedUsername, generatedUserPassword, "", model);
         response = await app.handle(trigger);
         expect(response.statusCode).to.equal(204);
 
@@ -84,7 +93,7 @@ describe("AmaBackendApp tests", () => {
         expect(decryptedApiKey).to.equal(undefined);
     });
 
-    function getTriggerEventPayload(username, password, apiKey) {
+    function getTriggerEventPayload(username, password, apiKey, model) {
 
         const usernameBase64 = Buffer.from(username).toString("base64");
 
@@ -105,7 +114,8 @@ describe("AmaBackendApp tests", () => {
                 "username": usernameBase64
             },
             "body": JSON.stringify({
-                apiKey: apiKey ? apiKey : ""
+                apiKey: apiKey ? apiKey : "",
+                model: model ? model : ""
             })
         }
     }

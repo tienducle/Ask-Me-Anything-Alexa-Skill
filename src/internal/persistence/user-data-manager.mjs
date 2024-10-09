@@ -215,6 +215,15 @@ export class UserDataManager {
     }
 
     /**
+     * Returns the configured gpt model of the user.
+     *
+     * @return {Promise<string>}
+     */
+    async getModel(alexaUserId) {
+        return (await this.#loadOrCreateUserData(alexaUserId)).getOpenAiModel();
+    }
+
+    /**
      * Returns the message history of the user specified by the user id.
      *
      * @param alexaUserId
@@ -424,23 +433,26 @@ export class UserDataManager {
     }
 
     /**
-     * Set the API key in the user data specified by the user id.
+     * Set the API key and model in the user data specified by the user id.
      *
      * @param alexaUserId {string}
      * @param apiKey {string}
+     * @param openAiModel {string}
      * @return {Promise<void>}
      */
-    async updateApiKey(alexaUserId, apiKey) {
+    async updateUserSettings(alexaUserId, apiKey, openAiModel) {
         const hashedAlexaUserId = this.getHashedAlexaUserId(alexaUserId);
         const apiKeyEncrypted = apiKey ? CryptoWrapper.encrypt(alexaUserId + hashedAlexaUserId + Environment.encryptedApiKeySalt, apiKey) : "";
 
-        const updateExpression = "set #apiKeyEncrypted = :apiKeyEncrypted, #lastModified = :lastModified";
+        const updateExpression = "set #apiKeyEncrypted = :apiKeyEncrypted, #openAiModel = :openAiModel, #lastModified = :lastModified";
         const expressionAttributeNames = {
             "#apiKeyEncrypted": "apiKeyEncrypted",
+            "#openAiModel": "openAiModel",
             "#lastModified": "lastModified"
         };
         const expressionAttributeValues = {
             ":apiKeyEncrypted": apiKeyEncrypted,
+            ":openAiModel": openAiModel,
             ":lastModified": Date.now()
         };
 

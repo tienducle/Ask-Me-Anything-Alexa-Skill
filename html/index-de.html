@@ -6,7 +6,7 @@
     <title>Online Lexikon - API Key Update</title>
 </head>
 <body>
-<h1>Online Lexikon - (Alexa-Skill)</h1>
+<h1>Online Lexikon (Alexa-Skill)</h1>
 <h5>ursprünglich: AMA - Ask Me Anything</h5>
 <h4><a href="https://www.amazon.de/dp/B0D5HHK169/">Link zum Skill</a></h4>
 <h4><a href="https://aws.pinguincloud.de/ama/data-privacy-de.html">Link zur Datenschutzerklärung</a></h4>
@@ -25,7 +25,13 @@
     <label for="password">Password:</label>
     <input type="password" id="password" name="password" required><br><br>
     <label for="apiKey">API Key:</label>
-    <input type="text" id="apiKey" name="apiKey" required><br><br>
+    <input type="text" id="apiKey" name="apiKey" required> (benötigt mindestens Schreibrechte für "Model capabilities")<br><br>
+    <label for="model">Model:</label>
+    <select id="model" name="model">
+        <option value="gpt-4o">gpt-4o</option>
+        <option value="gpt-4o-mini">gpt-4o-mini</option>
+        <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+    </select><br><br>
     <button type="button" onclick="sendRequest()">Send</button>
 </form>
 
@@ -35,11 +41,12 @@
         const usernameBase64 = btoa(username);
         const password = document.getElementById('password').value;
         const apiKey = document.getElementById('apiKey').value;
+        const model = document.getElementById('model').value;
 
         const url = 'https://aws.pinguincloud.de/production/accounts/' + usernameBase64 + '/apiKey';
 
         const basicAuth = 'Basic ' + btoa(`${username}:${password}`);
-        const bodyData = { apiKey: apiKey };
+        const bodyData = { apiKey: apiKey, model: model };
 
         try {
             const response = await fetch(url, {

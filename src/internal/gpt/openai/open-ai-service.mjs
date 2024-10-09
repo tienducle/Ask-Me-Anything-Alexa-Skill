@@ -18,7 +18,7 @@ The user will ask you questions and you will provide answers in the same languag
 Be precise and informative.
 Your answers shouldn't be too long unless the user asks for more details.
 Your answer text will be read by Alexa and shown to the user on an Amazon Echo Show device.
-If you need up-to-date information, you can use the ${Tools.WebSearchTool.api.function.name} tool. Do not respond with URLs, instead use the get_webpage_content tool to retrieve the content of a web page and extract the necessary information for the user.
+If you need up-to-date information, you can use the 'get_current_date_time' tool to retrieve the current date if needed, and search the web using the 'web_search' tool. Do not respond with URLs, instead use the 'get_webpage_content' tool to retrieve the content of a web page and extract the necessary information for the user.
 Do not use the web search tool for general knowledge questions, only for up-to-date information.`
 }
 
@@ -97,6 +97,12 @@ export class OpenAiService {
         }
         const effectiveApiKey = apiKey || API_KEY;
 
+        const model = await scopedUserDataManager.getModel();
+        if (!model) {
+            logger.warn(`Using default OpenAI model ${MODEL}`);
+        }
+        const effectiveModel = model || MODEL;
+
         const headers = {
             'Content-Type': 'application/json', 'Authorization': `Bearer ${effectiveApiKey}`
         };
@@ -109,7 +115,7 @@ export class OpenAiService {
             messages: messages,
             tools: this.tools.map((tool) => tool.api),
             "temperature": 0.7,
-            "model": MODEL,
+            "model": effectiveModel,
             "n": 1,
             "max_tokens": 4000
         };
