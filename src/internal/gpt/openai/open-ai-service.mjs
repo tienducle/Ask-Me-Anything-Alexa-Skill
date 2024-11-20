@@ -1,5 +1,4 @@
 import Environment from "../../../environment.mjs";
-import LocaleService from "../../locale-service.mjs";
 import {Logger} from "../../logger.mjs";
 import {Tools} from "./tools/tools.mjs";
 import {Message} from "../../model/message.mjs";
@@ -107,7 +106,10 @@ export class OpenAiService {
             'Content-Type': 'application/json', 'Authorization': `Bearer ${effectiveApiKey}`
         };
 
-        const messages = [SYSTEM_MESSAGE, ...await scopedUserDataManager.getMessageHistory(), nextMessage];
+        const messages = [
+            { role: SYSTEM_MESSAGE.role, content: `The current datetime is ${new Date().toISOString()}.\n${SYSTEM_MESSAGE.content}`},
+            ...await scopedUserDataManager.getMessageHistory(),
+            nextMessage];
 
         await scopedUserDataManager.addMessageToHistory(nextMessage);
 
