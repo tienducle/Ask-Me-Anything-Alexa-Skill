@@ -90,7 +90,7 @@ export class Accounts {
             return Errors.BAD_REQUEST();
         }
 
-        const result = await this.userDataManager.updateUserSettings(alexaUserId, apiKey, model);
+        const result = await this.userDataManager.updateUserSettings(alexaUserId, apiKey, "OpenAI", model);
 
         if (logger.checkLogLevel(Logger.LEVEL_DEBUG)) {
             logger.debug("Result: " + JSON.stringify(result));

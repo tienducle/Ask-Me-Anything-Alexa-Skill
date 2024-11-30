@@ -15,10 +15,13 @@ export class Environment {
         this._encryptedUserIdSalt = process.env.ENCRYPTED_USER_ID_SALT;
         this._encryptedApiKeySalt = process.env.ENCRYPTED_API_KEY_SALT;
 
-        this._defaultGptServiceId = process.env.DEFAULT_GPT_SERVICE_ID || 'open-ai';
+        /* default service and model */
+        this._defaultLlmServiceId = process.env.DEFAULT_LLM_SERVICE_ID || 'OpenAI';
+        this._defaultLlmModel = process.env.DEFAULT_LLM_MODEL || 'gpt-4o';
 
+        /* OpenAI */
         this._openAiApiKey = process.env.OPEN_AI_API_KEY;
-        this._openAiModel = process.env.OPEN_AI_MODEL || 'gpt-4o';
+        this._defaultOpenAiModel = process.env.DEFAULT_OPEN_AI_MODEL || 'gpt-4o';
 
         this._googlePseSearchEngineId = process.env.GOOGLE_PSE_SEARCH_ENGINE_ID;
         this._googlePseApiKey = process.env.GOOGLE_PSE_API_KEY;
@@ -67,16 +70,20 @@ export class Environment {
         return this._encryptedApiKeySalt;
     }
 
-    get defaultGptServiceId() {
-        return this._defaultGptServiceId;
-    }
-
     get openAiApiKey() {
         return this._openAiApiKey;
     }
 
-    get openAiModel() {
-        return this._openAiModel;
+    get defaultOpenAiModel() {
+        return this._defaultOpenAiModel;
+    }
+
+    get defaultLlmServiceId() {
+        return this._defaultLlmServiceId;
+    }
+
+    get defaultLlmModel() {
+        return this._defaultLlmModel;
     }
 
     get googlePseSearchEngineId() {

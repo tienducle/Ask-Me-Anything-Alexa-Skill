@@ -13,7 +13,7 @@ const logger = new Logger('AskQuestionIntentHandler', process.env.LOG_LEVEL_ASK_
  */
 const SERVICES = {
     OPEN_AI: {
-        id: 'open-ai',
+        id: "OpenAI",
         displayName: "OpenAI",
         instance: new OpenAiService(),
         invoke: async function (scopedUserDataManager, query, locale) {
@@ -73,8 +73,8 @@ export class AskQuestionIntentHandler {
             }
         }
 
-        const gptServiceId = await this.userDataManager.getGptServiceId(alexaUserId) || Environment.defaultGptServiceId;
-        const service = Object.values(SERVICES).find(service => service.id === gptServiceId);
+        const llmServiceId = await this.userDataManager.getLlmServiceId(alexaUserId) || Environment.defaultLlmServiceId;
+        const service = Object.values(SERVICES).find(service => service.id === llmServiceId);
         const query = handlerInput.requestEnvelope.request.intent.slots.query?.value || handlerInput.requestEnvelope.request.intent.slots.fullQuery?.value;
         const answer = await service.invoke( this.userDataManager.getScopedUserDataManager(alexaUserId), query, locale );
 

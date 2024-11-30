@@ -51,21 +51,25 @@ export class LaunchRequestHandler {
             return this.respondWithCouldNotCreateUserAccountError(handlerInput);
         }
 
-        const model = await this.userDataManager.getModel(alexaUserId);
-        return this.respond(handlerInput, LocaleService.getLocalizedTexts(locale, "handler.launchRequest.welcomeText"), model);
+        const llmService = await this.userDataManager.getLlmServiceId(alexaUserId);
+        const llmModel = await this.userDataManager.getLlmModel(alexaUserId);
+        return this.respond(handlerInput, LocaleService.getLocalizedTexts(locale, "handler.launchRequest.welcomeText"), llmService, llmModel);
     }
 
     respondWithCouldNotCreateUserAccountError(handlerInput) {
         return this.respond(handlerInput, LocaleService.getLocalizedTexts(handlerInput.requestEnvelope._internal.locale, "handler.launchRequest.error.couldNotCreateUserAccount"));
     }
 
-    respond(handlerInput, texts, model) {
+    respond(handlerInput, texts, llmService, llmModel) {
         logger.debug(`Responding with ${JSON.stringify(texts)}`);
+
+        const llmInfo = `Service: ${llmService || Environment.defaultLlmServiceId + " (default)"}\n` +
+                               `Model: ${llmModel || Environment.defaultLlmModel + " (default)"}`;
 
         return handlerInput.responseBuilder
             .speak(texts.speechText)
             .reprompt(texts.speechText)
-            .withSimpleCard(texts.cardTitle, `Model: ${model || Environment.openAiModel}\n${texts.cardContent}`)
+            .withSimpleCard(texts.cardTitle, `${llmInfo}\n${texts.cardContent}`)
             .getResponse();
     }
 }

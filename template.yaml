@@ -11,9 +11,15 @@ Globals:
 
 Parameters:
   # Skill
+  DefaultLlmServiceId:
+    Type: String
+    Default: "OpenAI"
+  DefaultLlmModel:
+    Type: String
+    Default: "gpt-4o"
   OpenAiApiKey:
     Type: String
-  OpenAiModel:
+  DefaultOpenAiModel:
     Type: String
     Default: "gpt-4o"
   # Skill + Backend
@@ -74,8 +80,10 @@ Resources:
         Variables:
           LOG_LEVEL: !Ref LogLevel
           LOG_LEVEL_LOCALE_SERVICE: "warn"
+          DEFAULT_LLM_SERVICE_ID: !Ref DefaultLlmServiceId
+          DEFAULT_LLM_MODEL: !Ref DefaultLlmModel
           OPEN_AI_API_KEY: !Ref OpenAiApiKey
-          OPEN_AI_MODEL: !Ref OpenAiModel
+          DEFAULT_OPEN_AI_MODEL: !Ref DefaultOpenAiModel
           #          DYNAMO_DB_ENDPOINT_OVERRIDE: !Ref DynamoDbEndpointOverride
           DYNAMO_DB_REGION: !Ref DynamoDbRegion
           DYNAMO_DB_USER_DATA_TABLE_NAME: !Ref DynamoDbUserDataTableName

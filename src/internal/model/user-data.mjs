@@ -14,11 +14,9 @@ export class UserData {
             return new Message(messageParsed.role, messageParsed.content, messageParsed.tool_calls, messageParsed.tool_call_id, messageParsed.refusal);
         }) || [];
 
-        this.gptServiceId = data?.gptServiceId;
-
-        /* OpenAI */
         this.apiKeyEncrypted = data?.apiKeyEncrypted || "";
-        this.openAiModel = data?.openAiModel || "";
+        this.llmServiceId = data?.llmServiceId;
+        this.llmModel = data?.llmModel;
 
         /* Google Programmable Search Engine */
         this.googlePseId = data?.googlePseId || "";
@@ -69,8 +67,12 @@ export class UserData {
         return this.maxMessageHistory;
     }
 
-    getGptServiceId() {
-        return this.gptServiceId;
+    getLlmServiceId() {
+        return this.llmServiceId;
+    }
+
+    getLlmModel() {
+        return this.llmModel;
     }
 
     /**
@@ -83,10 +85,6 @@ export class UserData {
 
     getApiKeyEncrypted() {
         return this.apiKeyEncrypted;
-    }
-
-    getOpenAiModel() {
-        return this.openAiModel;
     }
 
     getGooglePseId() {

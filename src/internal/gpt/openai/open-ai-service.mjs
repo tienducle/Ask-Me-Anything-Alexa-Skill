@@ -5,7 +5,7 @@ import {Message} from "../../model/message.mjs";
 
 const logger = new Logger('OpenAiService', process.env.LOG_LEVEL_OPEN_AI_SERVICE);
 const API_KEY = Environment.openAiApiKey
-const MODEL = Environment.openAiModel
+const MODEL = Environment.defaultOpenAiModel
 
 const API_HOSTNAME = 'api.openai.com';
 const API_VERSION = 'v1';
@@ -96,7 +96,7 @@ export class OpenAiService {
         }
         const effectiveApiKey = apiKey || API_KEY;
 
-        const model = await scopedUserDataManager.getModel();
+        const model = await scopedUserDataManager.getLlmModel();
         if (!model) {
             logger.warn(`Using default OpenAI model ${MODEL}`);
         }

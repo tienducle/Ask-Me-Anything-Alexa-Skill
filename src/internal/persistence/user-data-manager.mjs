@@ -180,13 +180,12 @@ export class UserDataManager {
         }
     }
 
-    /**
-     *
-     * @param alexaUserId {string} re
-     * @return {Promise<string>}
-     */
-    async getGptServiceId(alexaUserId) {
-        return (await this.#loadOrCreateUserData(alexaUserId)).getGptServiceId();
+    async getLlmServiceId(alexaUserId) {
+        return (await this.#loadOrCreateUserData(alexaUserId)).getLlmServiceId();
+    }
+
+    async getLlmModel(alexaUserId) {
+        return (await this.#loadOrCreateUserData(alexaUserId)).getLlmModel();
     }
 
     /**
@@ -212,15 +211,6 @@ export class UserDataManager {
         this.putApiKeyToCache(hashedAlexaUserId, apiKey);
         logger.debug("Cached user API key")
         return apiKey;
-    }
-
-    /**
-     * Returns the configured gpt model of the user.
-     *
-     * @return {Promise<string>}
-     */
-    async getModel(alexaUserId) {
-        return (await this.#loadOrCreateUserData(alexaUserId)).getOpenAiModel();
     }
 
     /**
@@ -437,22 +427,25 @@ export class UserDataManager {
      *
      * @param alexaUserId {string}
      * @param apiKey {string}
-     * @param openAiModel {string}
+     * @param llmServiceId {string}
+     * @param llmModel {string}
      * @return {Promise<void>}
      */
-    async updateUserSettings(alexaUserId, apiKey, openAiModel) {
+    async updateUserSettings(alexaUserId, apiKey, llmServiceId, llmModel) {
         const hashedAlexaUserId = this.getHashedAlexaUserId(alexaUserId);
         const apiKeyEncrypted = apiKey ? CryptoWrapper.encrypt(alexaUserId + hashedAlexaUserId + Environment.encryptedApiKeySalt, apiKey) : "";
 
-        const updateExpression = "set #apiKeyEncrypted = :apiKeyEncrypted, #openAiModel = :openAiModel, #lastModified = :lastModified";
+        const updateExpression = "set #apiKeyEncrypted = :apiKeyEncrypted, #llmServiceId = :llmServiceId, #llmModel = :llmModel, #lastModified = :lastModified";
         const expressionAttributeNames = {
             "#apiKeyEncrypted": "apiKeyEncrypted",
-            "#openAiModel": "openAiModel",
+            "#llmServiceId": "llmServiceId",
+            "#llmModel": "llmModel",
             "#lastModified": "lastModified"
         };
         const expressionAttributeValues = {
             ":apiKeyEncrypted": apiKeyEncrypted,
-            ":openAiModel": openAiModel,
+            ":llmServiceId": llmServiceId,
+            ":llmModel": llmModel,
             ":lastModified": Date.now()
         };
 

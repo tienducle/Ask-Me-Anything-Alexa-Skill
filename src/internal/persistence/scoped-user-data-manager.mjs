@@ -28,13 +28,23 @@ export class ScopedUserDataManager {
         return this.userDataManager.getApiKey(this.userId);
     }
 
+
     /**
-     * Returns the configured gpt model of the user.
+     * Returns the configured LLM service of the user.
      *
      * @return {Promise<string>}
      */
-    async getModel() {
-        return this.userDataManager.getModel(this.userId);
+    async getLlmServiceId() {
+        return this.userDataManager.getLlmServiceId(this.userId);
+    }
+
+    /**
+     * Returns the configured LLM model of the user.
+     *
+     * @return {Promise<string>}
+     */
+    async getLlmModel() {
+        return this.userDataManager.getLlmModel(this.userId);
     }
 
     /**
