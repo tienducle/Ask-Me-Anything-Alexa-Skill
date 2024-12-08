@@ -1,7 +1,8 @@
 import Alexa from "ask-sdk-core";
 import LocaleService from "../internal/locale-service.mjs";
+import {LlmService} from "../internal/llm/llm-service.mjs";
 import {Logger} from "../internal/logger.mjs";
-import {OpenAiService} from "../internal/gpt/openai/open-ai-service.mjs";
+import {OpenAiService} from "../internal/llm/openai/open-ai-service.mjs";
 import {UserDataManager} from "../internal/persistence/user-data-manager.mjs";
 import Environment from "../environment.mjs";
 
@@ -76,7 +77,11 @@ export class AskQuestionIntentHandler {
         const llmServiceId = await this.userDataManager.getLlmServiceId(alexaUserId) || Environment.defaultLlmServiceId;
         const service = Object.values(SERVICES).find(service => service.id === llmServiceId);
         const query = handlerInput.requestEnvelope.request.intent.slots.query?.value || handlerInput.requestEnvelope.request.intent.slots.fullQuery?.value;
-        const answer = await service.invoke( this.userDataManager.getScopedUserDataManager(alexaUserId), query, locale );
+
+        const llmService = new LlmService();
+        const answer = await llmService.getAnswer(this.userDataManager.getScopedUserDataManager(alexaUserId), query, locale);
+
+        // const answer = await service.invoke( this.userDataManager.getScopedUserDataManager(alexaUserId), query, locale );
 
         if (!userApiKey)
         {
