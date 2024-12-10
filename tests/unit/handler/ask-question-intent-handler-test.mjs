@@ -74,5 +74,14 @@ describe("AskQuestionIntentHandler tests", () => {
         const speechResponse = response.response.outputSpeech.ssml;
         logger.info("Response: " + speechResponse);
     });
+
+
+    it("verify AskQuestionIntentHandler returns search engine response", async () => {
+        const app = new AmaApp();
+        const trigger = TestIntentHelper.getAskQuestionIntent("search on 3 web pages for todays world news");
+        const response = await app.handle(trigger);
+        const speechResponse = response.response.outputSpeech.ssml;
+        logger.info("Response: " + speechResponse);
+    });
 });
 

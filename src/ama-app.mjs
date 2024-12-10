@@ -32,6 +32,7 @@ export class AmaApp {
         }
 
         if (Environment.dynamoDbEndpointOverride) {
+            logger.debug(`Using DynamoDB endpoint override: ${Environment.dynamoDbEndpointOverride}`);
             dynamoDbClientConfig.endpoint = Environment.dynamoDbEndpointOverride;
         }
 

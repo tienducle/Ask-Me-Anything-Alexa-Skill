@@ -22,6 +22,11 @@ Parameters:
   DefaultOpenAiModel:
     Type: String
     Default: "gpt-4o"
+  AnthropicApiKey:
+    Type: String
+  DefaultAnthropicModel:
+    Type: String
+    Default: "claude-3-5-haiku-latest"
   # Skill + Backend
   LogLevel:
     Type: String
@@ -31,9 +36,9 @@ Parameters:
       - warn
       - info
       - debug
-  #    DynamoDbEndpointOverride:
-  #      Type: String
-  #      Default: ""
+  DynamoDbEndpointOverride:
+    Type: String
+    Default: ""
   DynamoDbRegion:
     Type: String
     Default: "eu-west-1"
@@ -84,7 +89,9 @@ Resources:
           DEFAULT_LLM_MODEL: !Ref DefaultLlmModel
           OPEN_AI_API_KEY: !Ref OpenAiApiKey
           DEFAULT_OPEN_AI_MODEL: !Ref DefaultOpenAiModel
-          #          DYNAMO_DB_ENDPOINT_OVERRIDE: !Ref DynamoDbEndpointOverride
+          ANTHROPIC_API_KEY: !Ref AnthropicApiKey
+          DEFAULT_ANTHROPIC_MODEL: !Ref DefaultAnthropicModel
+          DYNAMO_DB_ENDPOINT_OVERRIDE: !Ref DynamoDbEndpointOverride
           DYNAMO_DB_REGION: !Ref DynamoDbRegion
           DYNAMO_DB_USER_DATA_TABLE_NAME: !Ref DynamoDbUserDataTableName
           DYNAMO_DB_USER_DATA_TABLE_PARTITION_KEY_NAME: !Ref DynamoDbUserDataTablePartitionKeyName

@@ -4,6 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Online Lexicon - API Key Update</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            padding: 20px;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus,
+        select:focus {
+            border-color: #007BFF;
+            outline: none;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
 <h1>Online Lexicon (Alexa-Skill)</h1>
@@ -11,14 +65,13 @@
 <h4><a href="https://www.amazon.de/dp/B0D5HHK169/">Link to Skill</a></h4>
 <h4><a href="https://aws.pinguincloud.de/ama/data-privacy-en.html">Link to Privacy Policy</a></h4>
 <h2>Overview</h2>
-<p>Using the form below, you can configure your own OpenAI API key to be used with the skill. Say "Register" to obtain your personalized, generated login credentials and enter them in the form below.</p>
-<p>For more information about OpenAI API keys, please consult the <a href="https://help.openai.com/en/articles/4936850-where-do-i-find-my-openai-api-key">OpenAI documentation</a>.</p>
+<p>Using the form below, you can configure your own API key (OpenAI or Anthropic) to be used with the skill. Say "Register" to obtain your personalized, generated login credentials and enter them in the form below.</p>
+<p>For more information about API keys, please consult the <a href="https://help.openai.com/en/articles/4936850-where-do-i-find-my-openai-api-key">OpenAI documentation</a> or <a href="https://docs.anthropic.com/en/api/getting-started">Anthropic documentation</a>.</p>
 <h4>Encryption Details</h4>
 <p>Your API key will be encrypted with your personal AWS UserId and an additional <a href="https://en.wikipedia.org/wiki/Salt_(cryptography)">Salt</a>.</p>
-<p>When you open the skill, the Lambda backend decrypts your API key into memory to use it for the OpenAI API requests.</p>
+<p>When you open the skill, the Lambda backend decrypts your API key into memory to use it for the API requests.</p>
+<h4>Update preferences</h4>
 <p>To delete your API key, submit the form below with an empty API key value.</p>
-<p>The full code will be available on Github in the next weeks.</p>
-<p>------</p>
 <form id="updateForm">
     <label for="username">Username:</label>
     <input type="text" id="username" name="username" required><br><br>
@@ -28,8 +81,10 @@
     <input type="text" id="apiKey" name="apiKey" required> (requires at least write permissions for "Model capabilities")<br><br>
     <label for="model">Model:</label>
     <select id="model" name="model">
-        <option value="gpt-4o">gpt-4o</option>
-        <option value="gpt-4o-mini">gpt-4o-mini</option>
+        <option value="gpt-4o">gpt-4o (OpenAI)</option>
+        <option value="gpt-4o-mini">gpt-4o-mini (OpenAI)</option>
+        <option value="claude-3-5-sonnet-latest">claude-3-5-sonnet-latest (Anthropic)</option>
+        <option value="claude-3-5-haiku-latest">claude-3-5-haiku-latest (Anthropic)</option>
     </select><br><br>
     <button type="button" onclick="sendRequest()">Send</button>
 </form>

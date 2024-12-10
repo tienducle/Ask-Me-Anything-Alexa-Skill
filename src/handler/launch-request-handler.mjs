@@ -47,7 +47,7 @@ export class LaunchRequestHandler {
                 return this.respondWithCouldNotCreateUserAccountError(handlerInput);
             }
         } catch (error) {
-            logger.error(`Error while ensuring loading user data entry: ${error}`);
+            logger.error(`Error while ensuring loading user data entry: ${error.stack}`);
             return this.respondWithCouldNotCreateUserAccountError(handlerInput);
         }
 

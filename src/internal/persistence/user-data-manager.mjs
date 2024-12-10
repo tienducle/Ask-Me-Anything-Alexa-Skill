@@ -243,9 +243,9 @@ export class UserDataManager {
             // when a function call was used, the messages sequence is user, assistant, tool, assistant
             // when the user+assistant message pairs were deleted, the tool message will cause an error
             // because a tool message must be preceded by the assistant message
-            if (messageHistory[0].getRole() === 'tool') {
-                messageHistory.shift();
-            }
+            // if (messageHistory[0].getRole() === 'tool') {
+            //     messageHistory.shift();
+            // }
         }
     }
 
@@ -434,15 +434,20 @@ export class UserDataManager {
     async updateUserSettings(alexaUserId, apiKey, llmServiceId, llmModel) {
         const hashedAlexaUserId = this.getHashedAlexaUserId(alexaUserId);
         const apiKeyEncrypted = apiKey ? CryptoWrapper.encrypt(alexaUserId + hashedAlexaUserId + Environment.encryptedApiKeySalt, apiKey) : "";
-
-        const updateExpression = "set #apiKeyEncrypted = :apiKeyEncrypted, #llmServiceId = :llmServiceId, #llmModel = :llmModel, #lastModified = :lastModified";
+        const userData = await this.#loadOrCreateUserData(alexaUserId);
+        userData.setLlmServiceId(llmServiceId);
+        userData.setLlmModel(llmModel);
+        userData.setApiKeyEncrypted(apiKey);
+        const updateExpression = "set #messageHistory = :messageHistory, #apiKeyEncrypted = :apiKeyEncrypted, #llmServiceId = :llmServiceId, #llmModel = :llmModel, #lastModified = :lastModified";
         const expressionAttributeNames = {
+            "#messageHistory": "messageHistory",
             "#apiKeyEncrypted": "apiKeyEncrypted",
             "#llmServiceId": "llmServiceId",
             "#llmModel": "llmModel",
             "#lastModified": "lastModified"
         };
         const expressionAttributeValues = {
+            ":messageHistory": [],
             ":apiKeyEncrypted": apiKeyEncrypted,
             ":llmServiceId": llmServiceId,
             ":llmModel": llmModel,

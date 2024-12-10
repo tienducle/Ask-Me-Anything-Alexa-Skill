@@ -1,26 +1,13 @@
+import Environment from "../environment.mjs";
 import Alexa from "ask-sdk-core";
 import LocaleService from "../internal/locale-service.mjs";
 import {Logger} from "../internal/logger.mjs";
-import {OpenAiService} from "../internal/gpt/openai/open-ai-service.mjs";
+import {AnthropicService} from "../internal/llm/anthropic/anthropic-service.mjs";
+import {OpenAiService} from "../internal/llm/openai/open-ai-service.mjs";
 import {UserDataManager} from "../internal/persistence/user-data-manager.mjs";
-import Environment from "../environment.mjs";
+import {LlmServices} from "../internal/llm/llm-services.mjs";
 
 const logger = new Logger('AskQuestionIntentHandler', process.env.LOG_LEVEL_ASK_QUESTION_INTENT_HANDLER);
-
-/*
- * Available services to use for answering questions.
- * Currently only OpenAI is supported.
- */
-const SERVICES = {
-    OPEN_AI: {
-        id: "OpenAI",
-        displayName: "OpenAI",
-        instance: new OpenAiService(),
-        invoke: async function (scopedUserDataManager, query, locale) {
-            return await this.instance.getAnswer(scopedUserDataManager, query, locale);
-        }
-    }
-}
 
 export class AskQuestionIntentHandler {
 
@@ -74,8 +61,12 @@ export class AskQuestionIntentHandler {
         }
 
         const llmServiceId = await this.userDataManager.getLlmServiceId(alexaUserId) || Environment.defaultLlmServiceId;
-        const service = Object.values(SERVICES).find(service => service.id === llmServiceId);
+        const service = LlmServices.getServiceById(llmServiceId);
         const query = handlerInput.requestEnvelope.request.intent.slots.query?.value || handlerInput.requestEnvelope.request.intent.slots.fullQuery?.value;
+
+        // const llmService = new LlmService();
+        // const answer = await service.getAnswer(this.userDataManager.getScopedUserDataManager(alexaUserId), query, locale);
+
         const answer = await service.invoke( this.userDataManager.getScopedUserDataManager(alexaUserId), query, locale );
 
         if (!userApiKey)

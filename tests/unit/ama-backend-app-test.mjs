@@ -5,6 +5,7 @@ import {DynamoDbClientWrapper} from "../../src/internal/client/dynamo-db-client-
 import {UserAccountMappingsManager} from "../../src/internal/persistence/user-account-mappings-manager.mjs";
 import {UserDataManager} from "../../src/internal/persistence/user-data-manager.mjs";
 import {Common} from "./common.mjs";
+import {Message} from "../../src/internal/model/message/message.mjs";
 
 describe("AmaBackendApp tests", () => {
 
@@ -69,7 +70,40 @@ describe("AmaBackendApp tests", () => {
         expect(response.statusCode).to.equal(400);
     });
 
-    it("verify that request with correct credentials successfully sets the api key", async () => {
+    it("verify that request with correct credentials but unsupported model is rejected with 400", async () => {
+        const trigger = getTriggerEventPayload(generatedUsername, generatedUserPassword, apiKey, "gpt-40k");
+        const app = new AmaBackendApp();
+
+        const response = await app.handle(trigger);
+        expect(response.statusCode).to.equal(400);
+    });
+
+    it("verify Anthropic service is set when user selects an Anthropic model", async () => {
+
+        const userModelInput = "claude-3-5-sonnet-latest";
+
+        const trigger = getTriggerEventPayload(generatedUsername, generatedUserPassword, apiKey, userModelInput);
+        const app = new AmaBackendApp();
+
+        const response = await app.handle(trigger);
+        expect(response.statusCode).to.equal(204);
+
+        // end session to flush cache of local userDataManager instance
+        await userDataManager.endSession(alexaUserId);
+        const llmServiceId = await userDataManager.getLlmServiceId(alexaUserId);
+        expect(llmServiceId).to.equal("Anthropic");
+        const llmModel = await userDataManager.getLlmModel(alexaUserId);
+        expect(llmModel).to.equal(userModelInput);
+    });
+
+
+    it("verify that request with correct credentials successfully sets the api key and deletes message history", async () => {
+
+        await userDataManager.addMessageToHistory(alexaUserId, new Message("user", "test message"));
+        await userDataManager.endSession(alexaUserId);
+        let messages = await userDataManager.getMessageHistory(alexaUserId);
+        expect(messages.length).to.equal(1);
+
         let trigger = getTriggerEventPayload(generatedUsername, generatedUserPassword, apiKey, model);
         const app = new AmaBackendApp();
 
@@ -91,6 +125,10 @@ describe("AmaBackendApp tests", () => {
 
         decryptedApiKey = await userDataManager.getApiKey(alexaUserId);
         expect(decryptedApiKey).to.equal(undefined);
+
+        // message history should be emptied
+        messages = await userDataManager.getMessageHistory(alexaUserId);
+        expect(messages.length).to.equal(0);
     });
 
     function getTriggerEventPayload(username, password, apiKey, model) {

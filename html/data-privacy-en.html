@@ -4,6 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Online Lexicon - Privacy Policy</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            padding: 20px;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus,
+        select:focus {
+            border-color: #007BFF;
+            outline: none;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
 <h1>Online Lexicon (Alexa-Skill)</h1>
@@ -16,10 +70,10 @@ On the web page https://link.pinguincloud.de/ama-en [1] you will be asked to ent
 <h2>Stored data</h2>
 <h3>Use without own API key</h3>
 <b>id</b> - The ASK-SDK automatically generates a unique user ID. This ID is unique for each skill, that is in use by the user. The ID is only stored as a SHA-512 hash.<br>
-<b>messageHistory</b> - Up to 5 messages, that were sent by the user, will be stored and used in the OpenAI API requests, to allow the user to ask follow-up questions and provide more context to the GPT model.<br>
+<b>messageHistory</b> - Up to 5 messages, that were sent by the user, will be stored and used in the LLM API requests, to allow the user to ask follow-up questions and provide more context to the GPT model.<br>
 <b>usagesByMonth</b> - List with twelve entries, which store the count of requests that were made by the user, to enforce the maximum quota of 30 requests per month. The counter of the upcoming month is always resetted to zero.<br>
 <h3>Use with own API key</h3>
-<b>apiKey</b> - The API key is stored encrypted using the SHA-512 hash of the user ID and an additional salt. The API key is only decrypted in-memory by the AWS Lambda backend to send requests to the OpenAI API.<br>
+<b>apiKey</b> - The API key is stored encrypted using the SHA-512 hash of the user ID and an additional salt. The API key is only decrypted in-memory by the AWS Lambda backend to send requests to the LLM API.<br>
 <h2>User Identification</h2>
 Every user, that activates the skill, gets an individual "Skill User ID" assigned by Amazon Alexa. Your user profile is stored under this ID.
 A conclusion from this "Skill User ID" to your identity or your Amazon username is not possible to my knowledge.

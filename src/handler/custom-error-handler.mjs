@@ -13,7 +13,7 @@ export const CustomErrorHandler = {
      * @return {boolean}
      */
     canHandle(handlerInput, error) {
-        logger.error(`Error handler triggered: ${error.message}`);
+        logger.error(`Error handler triggered: ${error.stack}`);
         return true;
     },
 

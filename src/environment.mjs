@@ -23,6 +23,10 @@ export class Environment {
         this._openAiApiKey = process.env.OPEN_AI_API_KEY;
         this._defaultOpenAiModel = process.env.DEFAULT_OPEN_AI_MODEL || 'gpt-4o';
 
+        /* Anthropic */
+        this._anthropicApiKey = process.env.ANTHROPIC_API_KEY;
+        this._defaultAnthropicModel = process.env.DEFAULT_ANTHROPIC_MODEL || 'claude-3-5-haiku-latest';
+
         this._googlePseSearchEngineId = process.env.GOOGLE_PSE_SEARCH_ENGINE_ID;
         this._googlePseApiKey = process.env.GOOGLE_PSE_API_KEY;
         this._customSearchEngineBlocklist = process.env.CUSTOM_SEARCH_ENGINE_BLOCKLIST?.split(',') || [];
@@ -76,6 +80,14 @@ export class Environment {
 
     get defaultOpenAiModel() {
         return this._defaultOpenAiModel;
+    }
+
+    get anthropicApiKey() {
+        return this._anthropicApiKey;
+    }
+
+    get defaultAnthropicModel() {
+        return this._defaultAnthropicModel;
     }
 
     get defaultLlmServiceId() {

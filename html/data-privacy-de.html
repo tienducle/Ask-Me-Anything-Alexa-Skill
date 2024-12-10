@@ -4,6 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Online Lexikon - Datenschutzerklärung</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            padding: 20px;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus,
+        select:focus {
+            border-color: #007BFF;
+            outline: none;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
 <h1>Online Lexikon (Alexa-Skill)</h1>
@@ -12,14 +66,14 @@
 </br>
 <h2>Datenschutzerklärung (gemäß Art. 13 DSGVO)</h2>
 <h2>Übersicht</h2>
-Auf der Webseite https://link.pinguincloud.de/ama-de [1] werden Sie gebeten, Daten einzugeben, die zur Benutzung des Alexa-Skills "Online Lexikon" notwendig sind, falls Sie Ihren eigenen OpenAI API-Schlüssel verwenden wollten.
+Auf der Webseite https://link.pinguincloud.de/ama-de [1] werden Sie gebeten, Daten einzugeben, die zur Benutzung des Alexa-Skills "Online Lexikon" notwendig sind, falls Sie Ihren eigenen LLM API-Schlüssel verwenden wollten.
 <h2>Gespeicherte Daten</h2>
 <h3>Nutzung ohne eigenen API-Schlüssel</h3>
 <b>id</b> - Vom ASK-SDK wird automatisch eine eindeutige Benutzer-ID generiert. Diese ist für jeden Skill des Benutzers unterschiedlich und wird nur als SHA-512 Hash gespeichert.<br>
 <b>messageHistory</b> - Bis zu 5 letzte Nachrichten, die der Benutzer an den Skill gesendet hat, werden gespeichert. Diese werden für die Kommunikation mit dem GPT Modell verwendet, damit der Benutzer Folgefragen stellen kann und das GPT Modell den Bezug zu den vorherigen Fragen nicht verliert.<br>
 <b>usagesByMonth</b> - Liste mit zwölf Einträgen, die die Anzahl der Anfragen pro Monat speichert, um zu erkennen ob das Limit von 30 Anfragen pro Monat erreicht wurde. Der Zähler des kommenden Monats wird dabei immer genullt.<br>
 <h3>Nutzung mit einem eigenen API-Schlüssel</h3>
-<b>apiKey</b> - Der API-Schlüssel wird mit dem SHA-512 Hashwert der Benutzer ID und einem zusätzlichem Salt verschlüsselt gespeichert. Der Schlüssel wird nur im Arbeitsspeicher des AWS Lambda Backends entschlüsselt, um Anfragen an die OpenAI API zu senden.<br>
+<b>apiKey</b> - Der API-Schlüssel wird mit dem SHA-512 Hashwert der Benutzer ID und einem zusätzlichem Salt verschlüsselt gespeichert. Der Schlüssel wird nur im Arbeitsspeicher des AWS Lambda Backends entschlüsselt, um Anfragen an die LLM API zu senden.<br>
 <h2>Benutzeridentifizierung</h2>
 Jeder Benutzer, der den Skill aktiviert bekommt eine individuelle „Skill User ID“ von Amazon Alexa zugewiesen. Ihr Benutzerprofil wird unter dieser ID abgespeichert.
 Ein Rückschluss von dieser „Skill User ID“ auf Ihre Identität oder ihren Amazon Benutzernamen ist nach meiner Information nicht möglich.

@@ -3,7 +3,9 @@ import bcrypt from 'bcryptjs';
 import {Logger} from "../logger.mjs";
 import {Errors} from "./errors.mjs"
 import Environment from "../../environment.mjs";
-import crypto from "crypto";
+import {AnthropicService} from "../llm/anthropic/anthropic-service.mjs";
+import {OpenAiService} from "../llm/openai/open-ai-service.mjs";
+import {LlmServices} from "../llm/llm-services.mjs";
 
 /**
  * LOG_LEVEL: error|debug
@@ -80,17 +82,23 @@ export class Accounts {
         // now we can access the corresponding user in the userdata table
         logger.debug("Store encrypted api key in user data")
         const payloadObj = this.parseBodyPayload(lambdaTriggerPayload.body);
-        if ( !payloadObj ) {
+        if (!payloadObj) {
             return Errors.BAD_REQUEST();
         }
 
         const apiKey = payloadObj.apiKey;
-        const model =  payloadObj.model;
-        if ( !model || model.length === 0 ) {
+        const model = payloadObj.model;
+        if (!model || model.length === 0) {
             return Errors.BAD_REQUEST();
         }
 
-        const result = await this.userDataManager.updateUserSettings(alexaUserId, apiKey, "OpenAI", model);
+        // look in AnthropicService.MODELS and OpenAiService.MODELS to find a match based on the model
+        let llmServiceId = LlmServices.getServiceByModel(model)?.id;
+        if (!llmServiceId) {
+            return Errors.BAD_REQUEST();
+        }
+
+        const result = await this.userDataManager.updateUserSettings(alexaUserId, apiKey, llmServiceId, model);
 
         if (logger.checkLogLevel(Logger.LEVEL_DEBUG)) {
             logger.debug("Result: " + JSON.stringify(result));

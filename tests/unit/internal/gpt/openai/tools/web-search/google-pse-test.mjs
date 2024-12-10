@@ -1,6 +1,6 @@
 import {assert} from "chai";
 import {expect} from "chai";
-import {GooglePse} from "../../../../../../../src/internal/gpt/openai/tools/web-search/google-pse.mjs";
+import {GooglePse} from "../../../../../../../src/internal/llm/common/tools/web-search/google-pse.mjs";
 import Environment from "../../../../../../../src/environment.mjs";
 import { JSDOM } from 'jsdom';
 import iconv from 'iconv-lite';

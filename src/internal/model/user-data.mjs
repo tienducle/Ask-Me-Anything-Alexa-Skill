@@ -1,4 +1,4 @@
-import {Message} from "./message.mjs";
+import {Message} from "./message/message.mjs";
 
 export class UserData {
 
@@ -8,10 +8,10 @@ export class UserData {
         this.registered = data?.registered || false;
         this.username = data?.username || "";
         this.usagesByMonth = data?.usagesByMonth || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-        this.maxMessageHistory = data?.maxMessageHistory || 10
+        this.maxMessageHistory = data?.maxMessageHistory || 12
         this.messageHistory = data?.messageHistory?.map((messageSerialized) => {
             const messageParsed = JSON.parse(messageSerialized);
-            return new Message(messageParsed.role, messageParsed.content, messageParsed.tool_calls, messageParsed.tool_call_id, messageParsed.refusal);
+            return new Message(messageParsed.role, messageParsed.content);
         }) || [];
 
         this.apiKeyEncrypted = data?.apiKeyEncrypted || "";
@@ -71,8 +71,16 @@ export class UserData {
         return this.llmServiceId;
     }
 
+    setLlmServiceId(llmServiceId) {
+        this.llmServiceId = llmServiceId;
+    }
+
     getLlmModel() {
         return this.llmModel;
+    }
+
+    setLlmModel(llmModel) {
+        this.llmModel = llmModel;
     }
 
     /**
@@ -85,6 +93,10 @@ export class UserData {
 
     getApiKeyEncrypted() {
         return this.apiKeyEncrypted;
+    }
+
+    setApiKeyEncrypted(apiKeyEncrypted) {
+        this.apiKeyEncrypted = apiKeyEncrypted;
     }
 
     getGooglePseId() {

@@ -13,8 +13,7 @@ export class Tools {
                 parameters: {
                     type: "object",
                     properties: {},
-                    required: [],
-                    additionalProperties: false,
+                    additionalProperties: false
                 },
             }
         },
@@ -88,4 +87,9 @@ export class Tools {
         }
     }
 
+    static AllTools = [
+        Tools.CurrentDateTimeTool,
+        Tools.WebSearchTool,
+        Tools.WebContentTool,
+    ]
 }
