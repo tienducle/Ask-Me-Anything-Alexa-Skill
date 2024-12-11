@@ -33,7 +33,7 @@ export class Tools {
             function: {
                 name: "web_search",
                 strict: true,
-                description: `Search the web for information. Call this whenever you need to search the web for information, for example when a user asks 'How is the weather today in London', then rephrase the query to optimize it for a web search and call the function with the query. Then, use the links provided in the search result to retrieve the content of a web page with the get_webpage_content tool. Do not just respond with the URLs to the user. Do not allow the user to ask for illegal things.`,
+                description: `Search the web for information. Call this whenever you need to search the web for information, for example when a user asks 'How is the weather today in London', then rephrase the query to optimize it for a web search and call the function with the query. The tool result contains a list of URLs which are the most relevant search results. You can retrieve the content of a web page with the get_webpage_content tool. Do not just respond with the URLs to the user. Do not allow the user to ask for illegal things.,`,
                 parameters: {
                     type: "object",
                     properties: {
@@ -88,7 +88,7 @@ export class Tools {
     }
 
     static AllTools = [
-        Tools.CurrentDateTimeTool,
+        // Tools.CurrentDateTimeTool,
         Tools.WebSearchTool,
         Tools.WebContentTool,
     ]

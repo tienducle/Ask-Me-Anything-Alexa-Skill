@@ -112,11 +112,14 @@ describe("RegistrationIntentHandler tests", () => {
         }
 
         const response = await app.handle(trigger);
-        expect(response.response.outputSpeech.ssml).to.equal("<speak>You can set up your own API Key at https://link.pinguincloud.de/ama-en. Use the following credentials. The skill will now close to invalidate your current session.</speak>");
+        expect(response.response.outputSpeech.ssml).to.contain("<speak>You can set up your own API Key at https://link.pinguincloud.de<say-as interpret-as='spell-out'>/ama-en</say-as>. Use the following credentials:");
+        expect(response.response.outputSpeech.ssml).to.contain("Username: <prosody rate='x-slow'><say-as interpret-as='spell-out'>3254680#");
+        expect(response.response.outputSpeech.ssml).to.contain("Password: <prosody rate='x-slow'><say-as interpret-as='spell-out'>pbxUmPPU</say-as></prosody>.");
+        expect(response.response.outputSpeech.ssml).to.contain("The skill will now close to invalidate your current session.</speak>");
         expect(response.response.card.content).to.contain("You can set up your own API Key at https://link.pinguincloud.de/ama-en\n");
         expect(response.response.card.content).to.contain("Use the following credentials:\n");
         expect(response.response.card.content).to.contain("Username: 3254680#");
-        expect(response.response.card.content).to.contain("Password: pbxUmPPUntanM5dR");
+        expect(response.response.card.content).to.contain("Password: pbxUmPPU");
     });
 
 });

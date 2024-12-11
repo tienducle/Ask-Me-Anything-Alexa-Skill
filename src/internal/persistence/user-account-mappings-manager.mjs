@@ -36,7 +36,7 @@ export class UserAccountMappingsManager {
         // generate password from hashedAlexaUserId + salt
         const passwordLong = simplifiedPasswordEncoding.encode(Buffer.from(hashedAlexaUserId + PASSWORD_SALT))
         // shorten password for convenience
-        return passwordLong.slice(0, 16);
+        return passwordLong.slice(0, 8);
     }
 
     async createAccountMapping(alexaUserId, hashedAlexaUserId) {

@@ -3,7 +3,7 @@
   "gpt.prefix": "Beantworte die folgende Frage: ",
   "handler.launchRequest.welcomeText.speechText": "Willkommen beim Online Lexikon.",
   "handler.launchRequest.welcomeText.cardTitle": "Willkommen beim Online Lexikon.",
-  "handler.launchRequest.welcomeText.cardContent": "Du kannst mich alles fragen.\nNeueste Funktion: Integration von Web-Suche. GPT-4o hat nun die Möglichkeit, eine Web-Suche durchzuführen, wenn man bspw. nach aktuellen Informationen fragt. Des Weiteren kann dies auch explizit angefragt werden, z.B. mit 'Suche im Web nach ...'.",
+  "handler.launchRequest.welcomeText.cardContent": "Du kannst mich alles fragen.\n\nNeueste Funktionen:\n- Unterstützung von Anthropic (claude-3-5)\n- Integration von Web-Suche. Der Skill hat nun die Möglichkeit, eine Web-Suche durchzuführen, wenn man bspw. nach aktuellen Informationen fragt. Des Weiteren kann dies auch explizit angefragt werden, z.B. mit 'Suche im Web nach ...'.",
   "handler.launchRequest.error.noUserId.speechText": "Keine userId wurde in der Alexa-Anfrage gefunden.",
   "handler.launchRequest.error.noUserId.cardTitle": "Error: ",
   "handler.launchRequest.error.couldNotCreateUserAccount.speechText": "Benutzerdaten konnten nicht erstellt werden. Dies ist erforderlich, um bis zu 3 Nachrichten für Deinen GPT-Kontext zu speichern.",
@@ -15,7 +15,7 @@
   "handler.help.text.speechText": "Du kannst mir einfach Fragen stellen. Ich verstehe auch Folgefragen. Wenn du deinen eigenen OpenAI API Key benutzen und/oder das GPT-Modell ändern möchtest, sage 'Registrieren'. Möchtest du nun probieren eine beliebige Frage zu stellen?",
   "handler.help.text.cardTitle": "Hilfe",
   "handler.help.repromptText.speechText": "Was möchtest du fragen?",
-  "handler.registration.successInfo.speechText": "Du kannst Deinen eigenen API-Schlüssel unter https://link.pinguincloud.de/ama-de einrichten. Verwende die folgenden Anmeldedaten. Der Skill wird nun beendet, um deine aktuelle Session zu invalidieren.",
+  "handler.registration.successInfo.speechText": "Du kannst Deinen eigenen API-Schlüssel unter https://link.pinguincloud.de<say-as interpret-as='spell-out'>/ama-de</say-as> einrichten. Verwende die folgenden Anmeldedaten: Benutzername: <prosody rate='x-slow'><say-as interpret-as='spell-out'>{username}</say-as></prosody>, Passwort: <prosody rate='x-slow'><say-as interpret-as='spell-out'>{password}</say-as></prosody>. Falls dies zu schnell war, verwende ein Gerät mit einem Display, z.B. die Alexa App auf deinem Handy und sage erneut: 'Registrieren'. Der Skill wird nun beendet, um deine aktuelle Session zu invalidieren.",
   "handler.registration.successInfo.cardTitle": "Registrierung",
   "handler.registration.successInfo.cardContent": "Du kannst Deinen eigenen API-Schlüssel unter https://link.pinguincloud.de/ama-de einrichten.\nVerwende die folgenden Anmeldedaten:\nBenutzername: {username}\nPasswort: {password}\n\nDer Skill wird nun beendet, um deine aktuelle Session zu invalidieren.",
   "handler.error.text.speechText": "Tut mir Leid, ich konnte deine Eingabe nicht verstehen.",
@@ -30,6 +30,6 @@
   "handler.askQuestion.repromptText.speechText": "Möchtest du noch eine Frage stellen?",
   "handler.askQuestion.repromptText.cardTitle": "Möchtest du noch eine Frage stellen?",
   "handler.askQuestion.repromptText.cardContent": "Möchtest du noch eine Frage stellen?",
-  "handler.askQuestion.quotaReached.speechText": "Du hast dein Nutzungslimit für diesen Monat erreicht. Um den Skill weiterhin nutzen zu können, verknüpfe einfach deinen eigenen OpenAI API-Schlüssel. Sage dazu 'Registrieren' und folge den Anweisungen.",
+  "handler.askQuestion.quotaReached.speechText": "Du hast dein Nutzungslimit für diesen Monat erreicht. Um den Skill weiterhin nutzen zu können, verknüpfe einfach deinen eigenen API-Schlüssel. Sage dazu 'Registrieren' und folge den Anweisungen.",
   "handler.askQuestion.quotaReached.cardTitle": "Fehler: "
 }

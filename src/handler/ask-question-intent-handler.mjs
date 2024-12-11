@@ -68,11 +68,7 @@ export class AskQuestionIntentHandler {
         // const answer = await service.getAnswer(this.userDataManager.getScopedUserDataManager(alexaUserId), query, locale);
 
         const answer = await service.invoke( this.userDataManager.getScopedUserDataManager(alexaUserId), query, locale );
-
-        if (!userApiKey)
-        {
-            await this.userDataManager.incrementUsageCount(alexaUserId, userApiKey);
-        }
+        await this.userDataManager.incrementUsageCountAndUpdateUserData(alexaUserId, userApiKey);
 
         const answerPrefixTexts = LocaleService.getLocalizedTexts(locale, "handler.askQuestion.answerPrefixText");
         const repromptTexts = LocaleService.getLocalizedTexts(locale, "handler.askQuestion.repromptText");

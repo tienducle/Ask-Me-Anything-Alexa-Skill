@@ -3,7 +3,7 @@
   "gpt.prefix": "Answer this question: ",
   "handler.launchRequest.welcomeText.speechText": "Welcome to the Online Lexicon.",
   "handler.launchRequest.welcomeText.cardTitle": "Welcome to the Online Lexicon.",
-  "handler.launchRequest.welcomeText.cardContent": "You can ask me anything.\nLatest feature: Integration of Web-Search. GPT-4o now has the ability to perform a web search when being asked for current information. Furthermore, this can also be explicitly requested, e.g. say 'Search the web for ...'.",
+  "handler.launchRequest.welcomeText.cardContent": "You can ask me anything.\n\nLatest features:\n- Anthropic support (claude-3-5)\n- Integration of Web-Search. The skill now has the ability to perform a web search when being asked for current information. Furthermore, this can also be explicitly requested, e.g. say 'Search the web for ...'.",
   "handler.launchRequest.error.noUserId.speechText": "No userId was found in Alexa request.",
   "handler.launchRequest.error.noUserId.cardTitle": "Error: ",
   "handler.launchRequest.error.couldNotCreateUserAccount.speechText": "User account data could not be created. This is required to store up to 3 messages for your GPT context.",
@@ -15,7 +15,7 @@
   "handler.help.text.speechText": "You can ask me anything you want. I can also understand follow up questions. If you want to use your own OpenAI API key or change the GPT model, say 'registration'. Do you want to try and ask me a question?",
   "handler.help.text.cardTitle": "Help",
   "handler.help.repromptText.speechText": "What do you want to ask?",
-  "handler.registration.successInfo.speechText": "You can set up your own API Key at https://link.pinguincloud.de/ama-en. Use the following credentials. The skill will now close to invalidate your current session.",
+  "handler.registration.successInfo.speechText": "You can set up your own API Key at https://link.pinguincloud.de<say-as interpret-as='spell-out'>/ama-en</say-as>. Use the following credentials: Username: <prosody rate='x-slow'><say-as interpret-as='spell-out'>{username}</say-as></prosody>, Password: <prosody rate='x-slow'><say-as interpret-as='spell-out'>{password}</say-as></prosody>. If this was too fast, use another device with a display, like the Alexa App on your mobile phone and say: 'registration', again. The skill will now close to invalidate your current session.",
   "handler.registration.successInfo.cardTitle": "Registration",
   "handler.registration.successInfo.cardContent": "You can set up your own API Key at https://link.pinguincloud.de/ama-en\nUse the following credentials:\nUsername: {username}\nPassword: {password}\n\nThe skill will now close to invalidate your current session.",
   "handler.error.text.speechText": "Sorry, I don't understand your command.",
@@ -30,6 +30,6 @@
   "handler.askQuestion.repromptText.speechText": "Do you have another question?",
   "handler.askQuestion.repromptText.cardTitle": "Do you have another question?",
   "handler.askQuestion.repromptText.cardContent": "Do you have another question?",
-  "handler.askQuestion.quotaReached.speechText": "You have reached your usage quota for this month. Please consider setting up your own API key by saying 'registration'.",
+  "handler.askQuestion.quotaReached.speechText": "You have reached your usage quota for this month. To continue using the skill, feel free to set up your own API key by saying 'registration' and following the instructions.",
   "handler.askQuestion.quotaReached.cardTitle": "Error: "
 }

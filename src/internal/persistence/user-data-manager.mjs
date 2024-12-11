@@ -157,27 +157,26 @@ export class UserDataManager {
     }
 
     /**
-     * Increments the current usage count of the user specified by the user id by one.
-     * Immediately persists the updated usage count to the database if the user is not
-     * using an own API key. Otherwise, the count is only persisted when the
-     * user session ends gracefully (less precise but trade-off for saving DDB costs).
+     * Increments the current usage count of the user specified by the user id by one
+     * and immediately persists the user data to the database.
+     *
+     * // TODO: this change was introduced because follow-up questions can hit a
+     * // different lambda instance, which would not have the user data in cache
+     * // and thus load outdated data from the database
      *
      * @param alexaUserId {string}
      * @param userApiKey {string}
      * @return {Promise<void>}
      */
-    async incrementUsageCount(alexaUserId, userApiKey) {
+    async incrementUsageCountAndUpdateUserData(alexaUserId, userApiKey) {
         const userData = await this.#loadOrCreateUserData(alexaUserId);
         const currentMonth = new Date().getMonth();
         const usagesByMonth = userData.getUsagesByMonth();
         usagesByMonth[currentMonth] = usagesByMonth[currentMonth] + 1;
         // always set usage of next month to 0, be cautious with december though
         usagesByMonth[(currentMonth + 1) % 12] = 0;
-        logger.debug("Incrementing usage count for unregistered user to " + usagesByMonth[currentMonth]);
-        if (!userApiKey) {
-            // persist state immediately
-            await this.#updateUserData(alexaUserId, userData.getMessageHistory(), userData.getUsagesByMonth());
-        }
+        userData.setHasChanged();
+        await this.#updateUserData(userData);
     }
 
     async getLlmServiceId(alexaUserId) {
@@ -235,6 +234,7 @@ export class UserDataManager {
         const userData = await this.#loadOrCreateUserData(alexaUserId);
         const messageHistory = userData.getMessageHistory();
         messageHistory.push(message);
+        userData.setHasChanged();
 
         if (messageHistory.length > userData.getMaxMessageHistory()) {
             messageHistory.shift();
@@ -261,7 +261,7 @@ export class UserDataManager {
         if (!userData) {
             return;
         }
-        await this.#updateUserData(alexaUserId, userData.getMessageHistory(), userData.getUsagesByMonth());
+        await this.#updateUserData(userData);
         logger.debug("Deleting current user data from caches");
         this.userDataCache.delete(this.getHashedAlexaUserId(alexaUserId));
         this.apiKeyCache.delete(this.getHashedAlexaUserId(alexaUserId));
@@ -399,12 +399,13 @@ export class UserDataManager {
     /**
      * Updates the user data in the database with the current message history and current usage counts.
      *
-     * @param alexaUserId {string}
-     * @param messageHistory {Message[]}
-     * @param usagesByMonth {Array<number>}
+     * @param userData {UserData}
      * @return {Promise<*>}
      */
-    async #updateUserData(alexaUserId, messageHistory, usagesByMonth) {
+    async #updateUserData(userData) {
+        if ( !userData.hasChanged() ) {
+            return;
+        }
         const updateExpression = "set #messageHistory = :messageHistory, #usagesByMonth = :usagesByMonth, #lastModified = :lastModified";
         const expressionAttributeNames = {
             "#messageHistory": "messageHistory",
@@ -413,13 +414,13 @@ export class UserDataManager {
         };
         const expressionAttributeValues = {
             // ":messageHistory": messageHistory.map((message) => message.serialize()),
-            ":messageHistory": messageHistory.map((message) => JSON.stringify(message)),
-            ":usagesByMonth": usagesByMonth,
+            ":messageHistory": userData.getMessageHistory().map((message) => JSON.stringify(message)),
+            ":usagesByMonth": userData.getUsagesByMonth(),
             ":lastModified": Date.now()
         };
 
         return this.dynamoDbClientWrapper.updateItem(DYNAMO_DB_TABLE_NAME, DYNAMO_DB_PARTITION_KEY_NAME,
-            this.getHashedAlexaUserId(alexaUserId), updateExpression, expressionAttributeNames, expressionAttributeValues);
+            userData.getHashedAlexaUserId(), updateExpression, expressionAttributeNames, expressionAttributeValues);
     }
 
     /**

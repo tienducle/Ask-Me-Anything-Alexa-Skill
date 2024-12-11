@@ -70,6 +70,7 @@ export class LaunchRequestHandler {
             .speak(texts.speechText)
             .reprompt(texts.speechText)
             .withSimpleCard(texts.cardTitle, `${llmInfo}\n${texts.cardContent}`)
+            .withApiResponse()
             .getResponse();
     }
 }

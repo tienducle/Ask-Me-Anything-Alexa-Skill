@@ -17,11 +17,11 @@ export class Environment {
 
         /* default service and model */
         this._defaultLlmServiceId = process.env.DEFAULT_LLM_SERVICE_ID || 'OpenAI';
-        this._defaultLlmModel = process.env.DEFAULT_LLM_MODEL || 'gpt-4o';
+        this._defaultLlmModel = process.env.DEFAULT_LLM_MODEL || 'gpt-4o-mini';
 
         /* OpenAI */
         this._openAiApiKey = process.env.OPEN_AI_API_KEY;
-        this._defaultOpenAiModel = process.env.DEFAULT_OPEN_AI_MODEL || 'gpt-4o';
+        this._defaultOpenAiModel = process.env.DEFAULT_OPEN_AI_MODEL || 'gpt-4o-mini';
 
         /* Anthropic */
         this._anthropicApiKey = process.env.ANTHROPIC_API_KEY;

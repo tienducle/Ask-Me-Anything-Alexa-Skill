@@ -63,6 +63,7 @@ export class RegistrationIntentHandler {
         const userPassword = this.userAccountMappingsManager.generateUserPassword(hashedAlexaUserId)
 
         const texts = LocaleService.getLocalizedTexts(locale, "handler.registration.successInfo");
+        texts.speechText = this.replaceCredentialsInText(texts.speechText, username, userPassword)
         texts.cardContent = this.replaceCredentialsInText(texts.cardContent, username, userPassword)
 
         logger.debug("Persisting user data before ending session");

@@ -21,6 +21,8 @@ export class UserData {
         /* Google Programmable Search Engine */
         this.googlePseId = data?.googlePseId || "";
         this.googlePseApiKeyEncrypted = data?.googlePseApiKeyEncrypted || "";
+
+        this.changed = false;
     };
 
     getHashedAlexaUserId() {
@@ -105,5 +107,14 @@ export class UserData {
 
     getGooglePseApiKeyEncrypted() {
         return this.googlePseApiKeyEncrypted;
+    }
+
+    setHasChanged()
+    {
+        this.changed = true;
+    }
+
+    hasChanged() {
+        return this.changed;
     }
 }
