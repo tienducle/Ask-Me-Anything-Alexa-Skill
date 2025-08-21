@@ -1,0 +1,6 @@
+{
+  "mochaExplorer.files": "tests/**/*-test.mjs",
+  "mochaExplorer.nodeEnv": {
+    "LOG_LEVEL": "debug"
+  }
+} 
