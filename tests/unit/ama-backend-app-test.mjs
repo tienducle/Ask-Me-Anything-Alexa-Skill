@@ -80,7 +80,7 @@ describe("AmaBackendApp tests", () => {
 
     it("verify Anthropic service is set when user selects an Anthropic model", async () => {
 
-        const userModelInput = "claude-3-5-sonnet-latest";
+        const userModelInput = "claude-sonnet-4-5";
 
         const trigger = getTriggerEventPayload(generatedUsername, generatedUserPassword, apiKey, userModelInput);
         const app = new AmaBackendApp();

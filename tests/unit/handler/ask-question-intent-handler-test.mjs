@@ -17,23 +17,32 @@ describe("AskQuestionIntentHandler tests", () => {
 
     it("verify AskQuestionIntentHandler returns GPT response", async () => {
         const app = new AmaApp();
+
         let trigger = TestIntentHelper.getAskQuestionIntent("Wie viel sind 2+2");
 
+        const durations = [];
+        let timer = performance.now();
         let response = await app.handle(trigger);
+        durations.push(performance.now()-timer);
+        logger.info(`Response time: ${durations[0]} ms`);
         console.log("Response: " + response.response.outputSpeech.ssml)
         expect(response.response.outputSpeech.ssml).to.not.equal("<speak>Tut mir Leid, ich konnte deine Eingabe nicht verstehen.</speak>");
         expect(response.response.outputSpeech.ssml).to.contain("4");
 
         trigger = TestIntentHelper.getAskQuestionIntent("Wie viel sind 15+15");
-
+        timer = performance.now();
         response = await app.handle(trigger);
+        durations.push(performance.now()-timer);
+        logger.info(`Response time: ${durations[1]} ms`);
         console.log("Response: " + response.response.outputSpeech.ssml)
         expect(response.response.outputSpeech.ssml).to.not.equal("<speak>Tut mir Leid, ich konnte deine Eingabe nicht verstehen.</speak>");
         expect(response.response.outputSpeech.ssml).to.contain("30");
 
         trigger = TestIntentHelper.getAskQuestionIntent("Wie viel sind 16+16");
-
+        timer = performance.now();
         response = await app.handle(trigger);
+        durations.push(performance.now()-timer);
+        logger.info(`Response time: ${durations[2]} ms`);
         console.log("Response: " + response.response.outputSpeech.ssml)
         expect(response.response.outputSpeech.ssml).to.not.equal("<speak>Tut mir Leid, ich konnte deine Eingabe nicht verstehen.</speak>");
         expect(response.response.outputSpeech.ssml).to.contain("32");
@@ -48,6 +57,10 @@ describe("AskQuestionIntentHandler tests", () => {
 
         let messageHistoryWrapper = await userDataManager.getMessageHistory("amzn1.ask.account.myuserid");
         console.log("Message history: " + JSON.stringify(messageHistoryWrapper));
+
+        // print average duration
+        const averageDuration = durations.reduce((a, b) => a + b, 0) / durations.length;
+        logger.info(`Average response time: ${averageDuration} ms`);
     });
 
     it("verify AskQuestionIntentHandler returns date-time-tool response", async () => {

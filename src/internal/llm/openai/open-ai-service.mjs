@@ -35,11 +35,77 @@ export class OpenAiService extends LlmService {
     static ID = "OpenAI";
 
     static MODELS = {
+        "gpt-4.1-mini": {
+            maxTokens: {
+                max_tokens: 16384
+            },
+            temperature: {
+                temperature: 0.7
+            },
+            reasoning: {}
+        },
+        "gpt-4.1-nano": {
+            maxTokens: {
+                max_tokens: 16384
+            },
+            temperature: {
+                temperature: 0.7
+            },
+            reasoning: {}
+        },
+        "gpt-4.1": {
+            maxTokens: {
+                max_tokens: 16384
+            },
+            temperature: {
+                temperature: 0.7
+            },
+            reasoning: {}
+        },
+        "gpt-5": {
+            maxTokens: {
+                max_completion_tokens: 16384
+            },
+            temperature: {},
+            reasoning: {
+                reasoning_effort: "minimal"
+            }
+        },
+        "gpt-5-mini": {
+            maxTokens: {
+                max_completion_tokens: 16384
+            },
+            temperature: {},
+            reasoning: {
+                reasoning_effort: "minimal"
+            }
+        },
+        "gpt-5-nano": {
+            maxTokens: {
+                max_completion_tokens: 16384
+            },
+            temperature: {},
+            reasoning: {
+                reasoning_effort: "minimal"
+            }
+        },
         "gpt-4o": {
-            maxTokens: 16384
+            maxTokens: {
+                max_tokens: 16384
+            },
+            temperature: {
+                temperature: 0.7
+            },
+            reasoning: {}
         },
         "gpt-4o-mini": {
-            maxTokens: 16384
+            maxTokens: {
+                max_tokens: 16384
+            },
+            temperature: {
+                temperature: 0.7
+            },
+            reasoning: {}
         }
     }
 
@@ -139,10 +205,11 @@ export class OpenAiService extends LlmService {
         const body = {
             messages: messages,
             tools: this.tools.map((tool) => tool.api),
-            "temperature": 0.7,
             "model": model,
             "n": 1,
-            "max_tokens": OpenAiService.MODELS[model].maxTokens
+            ...OpenAiService.MODELS[model].maxTokens,
+            ...OpenAiService.MODELS[model].temperature,
+            ...OpenAiService.MODELS[model].reasoning,
         };
 
         const options = {
