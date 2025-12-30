@@ -78,7 +78,7 @@ Resources:
     Properties:
       CodeUri: ./
       Handler: src/index-ama.handler
-      Runtime: nodejs20.x
+      Runtime: nodejs22.x
       Architectures:
         - x86_64
       Environment:
@@ -171,7 +171,7 @@ Resources:
     Properties:
       CodeUri: ./
       Handler: src/index-ama-backend.handler
-      Runtime: nodejs20.x
+      Runtime: nodejs22.x
       Architectures:
         - x86_64
       Events:
