@@ -25,7 +25,7 @@ const SYSTEM_MESSAGE = {
 The user will ask you questions and you will provide answers in the same language that the user uses.
 Be precise and informative.
 Your answers shouldn't be too long unless the user asks for more details.
-Your answer text will be read by Alexa and shown to the user on an Amazon Echo Show device.
+Your answer text will be read by Alexa and shown to the user on an Amazon Echo Show device. Therefore, you must only use plaintext format.
 If you need up-to-date information, you can search the web using the 'web_search' tool. Do not respond with URLs, instead use the 'get_webpage_content' tool to retrieve the content of a web page and extract the necessary information for the user.
 Do not use the web search tool for general knowledge questions, only for up-to-date information.`
 }
@@ -35,10 +35,10 @@ export class AnthropicService extends LlmService {
     static ID = "Anthropic";
 
     static MODELS = {
-        "claude-3-5-sonnet-latest": {
+        "claude-sonnet-4-5": {
             maxTokens: 8192
         },
-        "claude-3-5-haiku-latest": {
+        "claude-haiku-4-5": {
             maxTokens: 8192
         }
     }
